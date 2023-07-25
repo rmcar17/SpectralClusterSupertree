@@ -53,9 +53,47 @@ def spectral_cluster_supertree(
         # to find "best" components
         raise NotImplementedError
 
-    # TODO: Use components to recursively call SCS, and merge into new tree
+    # The subtrees corresponding to the components of the graph
+    subtrees = []
 
-    raise NotImplementedError
+    # TODO: What if there are more than two components?
+    # Previously I randomly resolved to make bifurcating.
+    # I suppose now it makes more sense to have that as a
+    # post-processing step?
+    # Slightly frustrating since spectral clustering will
+    # always generate two components.
+
+    for component in components:
+        # Trivial case for if the size of the component is <=2
+        # Simply add a tree expressing that
+        if len(component) <= 2:
+            subtrees.append(_tip_names_to_tree(component))
+            continue
+
+        # Otherwise, need to induce the trees on each compoment
+        # and recursively call SCS
+
+        # Note, inducing could possible remove trees.
+        new_induced_trees, new_weights = _generate_induced_trees_with_weights(
+            component, trees, weights
+        )
+
+
+def _generate_induced_trees_with_weights(
+    names: Set, trees: Sequence[TreeNode], weights: Sequence[float]
+) -> Tuple[Sequence[TreeNode], Sequence[float]]:
+    induced_trees = []
+    new_weights = []
+
+    for tree, weight in zip(trees, weights):
+        # If the tree would end up with less than two leaves,
+        # there is no point inducing (no proper clusters)
+        if len(names.intersection(tree.get_tip_names())) < 2:
+            continue
+        induced_trees.append(tree.get_sub_tree(names))
+        new_weights.append(weight)
+
+    return induced_trees, new_weights
 
 
 def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
