@@ -53,8 +53,8 @@ def spectral_cluster_supertree(
         # to find "best" components
         raise NotImplementedError
 
-    # The subtrees corresponding to the components of the graph
-    subtrees = []
+    # The child trees corresponding to the components of the graph
+    child_trees = []
 
     # TODO: What if there are more than two components?
     # Previously I randomly resolved to make bifurcating.
@@ -67,7 +67,7 @@ def spectral_cluster_supertree(
         # Trivial case for if the size of the component is <=2
         # Simply add a tree expressing that
         if len(component) <= 2:
-            subtrees.append(_tip_names_to_tree(component))
+            child_trees.append(_tip_names_to_tree(component))
             continue
 
         # Otherwise, need to induce the trees on each compoment
@@ -77,6 +77,26 @@ def spectral_cluster_supertree(
         new_induced_trees, new_weights = _generate_induced_trees_with_weights(
             component, trees, weights
         )
+
+        # Find the supertree for the induced trees
+        child_trees.append(spectral_cluster_supertree(new_induced_trees, new_weights))
+
+        # It is possible that some tip names are missed (particularly
+        # if inducing would only leave length 1). TODO: think more about when this case
+        # if exhibited
+        missing_tips = component.difference(_get_all_tip_names(new_induced_trees))
+
+        # In this case, treat these tips as individual subtrees
+        child_trees.extend(map(_tip_names_to_tree, missing_tips))
+
+    # Connect the child trees by making adjacent to a new root.
+    supertree = _connect_trees(child_trees)
+    return supertree
+
+
+def _connect_trees(trees: Iterable[TreeNode]):
+    tree_builder = TreeBuilder(constructor=TreeNode).edge_from_edge
+    return tree_builder(None, trees)
 
 
 def _generate_induced_trees_with_weights(
