@@ -1,5 +1,6 @@
-from typing import Dict, FrozenSet, Iterable, List, Sequence, Optional, Set, Tuple
-from cogent3.core.tree import TreeNode, TreeBuilder, PhyloNode
+from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
+
+from cogent3.core.tree import TreeBuilder, TreeNode
 
 
 def spectral_cluster_supertree(
