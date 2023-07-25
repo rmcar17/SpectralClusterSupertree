@@ -94,14 +94,41 @@ def spectral_cluster_supertree(
     return supertree
 
 
-def _connect_trees(trees: Iterable[TreeNode]):
+def _connect_trees(trees: Iterable[TreeNode]) -> TreeNode:
+    """
+    Connects the input trees by making them adjacent to a new root.
+
+    Args:
+        trees (Iterable[TreeNode]): The input trees to connect
+
+    Returns:
+        TreeNode: A tree connecting all the input trees
+    """
     tree_builder = TreeBuilder(constructor=TreeNode).edge_from_edge
     return tree_builder(None, trees)
 
 
 def _generate_induced_trees_with_weights(
     names: Set, trees: Sequence[TreeNode], weights: Sequence[float]
-) -> Tuple[Sequence[TreeNode], Sequence[float]]:
+) -> Tuple[List[TreeNode], List[float]]:
+    """
+    Induces the input trees on the set of names.
+
+    A tree can be induced on a set by removing all leaves that
+    are not in the set. More concisely, inducing gives a subtree
+    only containing the elements in names.
+
+    The results is a list of trees only expressing the given names
+    and a list containing their corresponding weights.
+
+    Args:
+        names (Set): The names to induce the trees on
+        trees (List[TreeNode]): The original trees to be induced
+        weights (List[float]): The corresponding weights of the trees
+
+    Returns:
+        Tuple[Sequence[TreeNode], Sequence[float]]: The induced trees and corresponding weights
+    """
     induced_trees = []
     new_weights = []
 
