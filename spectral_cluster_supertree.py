@@ -58,6 +58,18 @@ def spectral_cluster_supertree(
 
 
 def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
+    """
+    Given a graph expressed as a set of vertices and a dictionary of
+    edges (mapping vertices to sets of other vertices), find the
+    components of the graph.
+
+    Args:
+        vertices (Set): The set of edges.
+        edges (Dict): A mapping of vertices to sets of other vertices.
+
+    Returns:
+        List[Set]: A list of sets of vertices, each element a component.
+    """
     components = []
 
     unexplored = vertices.copy()
@@ -79,6 +91,25 @@ def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
 def _proper_cluster_graph_edges(
     pcg_vertices: Set, trees: Sequence[TreeNode], weights: Sequence[float]
 ) -> Tuple[Dict, Dict[FrozenSet, float]]:
+    """Constructs a proper cluster graph for a collection of weighted trees.
+
+    For a tree, two leaves belong to a proper cluster if the path connecting
+    them does not pass through the root. Equivalently, they are part of a
+    proper cluster if they are on the same side of the tree from the root.
+
+    The proper cluster graph contains all the leaves of the tree as vertices.
+    An edge connects two vertices if they belong to a proper cluster in any
+    of the input trees. Each edge is weighted by the sum of the weights of
+    the trees for which the connected vertices are a proper cluster.
+
+    Args:
+        pcg_vertices (Set): The names of all leaves in the input trees
+        trees (Sequence[TreeNode]): The trees expressing the proper clusters
+        weights (Sequence[float]): The weight of each tree
+
+    Returns:
+        Tuple[Dict, Dict[FrozenSet, float]]: The edges and weights of the edges
+    """
     edges = {}
     edge_weights = {}
 
