@@ -1,9 +1,9 @@
-from typing import Iterable, Sequence, Optional, Set
+from typing import Dict, FrozenSet, Iterable, List, Sequence, Optional, Set, Tuple
 from cogent3.core.tree import TreeNode, TreeBuilder, PhyloNode
 
 
 def spectral_cluster_supertree(
-    trees: Sequence[TreeNode], weights: Optional[Sequence[float]]
+    trees: Sequence[TreeNode], weights: Optional[Sequence[float]] = None
 ) -> TreeNode:
     """
     Spectral Cluster Supertree (SCS).
@@ -31,18 +31,73 @@ def spectral_cluster_supertree(
 
     assert len(trees) == len(weights), "trees and weights must be of same length"
 
-    all_names = _get_all_tip_names(trees)
+    # The vertices of the proper cluster graph
+    # are the names of the tips of all trees
+    pcg_vertices = _get_all_tip_names(trees)
 
     # If there are less than or only two names, can instantly return a tree
-    if len(all_names) <= 2:
+    if len(pcg_vertices) <= 2:
         # TODO: if there is only one name, do I actually need to return
         # A single tree node instead? Probably. Currently is root->single.
-        tree = _tip_names_to_tree(all_names)
+        tree = _tip_names_to_tree(pcg_vertices)
         return tree
 
     # TODO: Construct proper cluster graph... perform spectral clustering
+    pcg_edges, pcg_weights = _proper_cluster_graph_edges(pcg_vertices, trees, weights)
 
-    return TreeNode()
+    components = _get_graph_components(pcg_vertices, pcg_edges)
+
+    if len(components) == 1:
+        # TODO: If there the graph is connected, then need to perform spectral clustering
+        # to find "best" components
+        raise NotImplementedError
+
+    # TODO: Use components to recursively call SCS, and merge into new tree
+
+    raise NotImplementedError
+
+
+def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
+    components = []
+
+    unexplored = vertices.copy()
+    while unexplored:
+        frontier = [unexplored.pop()]
+        component = set(frontier)
+        while frontier:
+            current_vertex = frontier.pop()
+            for neighbour in edges[current_vertex]:
+                if neighbour not in component:
+                    frontier.append(neighbour)
+                    component.add(neighbour)
+        components.append(component)
+        unexplored.difference_update(component)
+
+    return components
+
+
+def _proper_cluster_graph_edges(
+    pcg_vertices: Set, trees: Sequence[TreeNode], weights: Sequence[float]
+) -> Tuple[Dict, Dict[FrozenSet, float]]:
+    edges = {}
+    edge_weights = {}
+
+    for name in pcg_vertices:
+        edges[name] = set()
+
+    for tree, weight in zip(trees, weights):
+        # TODO: Should I error if more than two children?
+        for side in tree:
+            names = side.get_tip_names()
+            for i in range(1, len(names)):
+                for j in range(i):
+                    edges[names[i]].add(names[j])
+                    edges[names[j]].add(names[i])
+
+                    edge = frozenset((names[i], names[j]))
+                    edge_weights[edge] = edge_weights.get(edge, 0) + weight
+
+    return edges, edge_weights
 
 
 def _get_all_tip_names(trees: Iterable[TreeNode]) -> Set:
