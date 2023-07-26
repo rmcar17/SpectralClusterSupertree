@@ -1,3 +1,4 @@
+import math
 from typing import (
     Collection,
     Dict,
@@ -59,6 +60,7 @@ def spectral_cluster_supertree(
     if len(components) == 1:
         # TODO: If there the graph is connected, then need to perform spectral clustering
         # to find "best" components
+
         raise NotImplementedError
 
     # The child trees corresponding to the components of the graph
@@ -100,6 +102,113 @@ def spectral_cluster_supertree(
     # Connect the child trees by making adjacent to a new root.
     supertree = _connect_trees(child_trees)
     return supertree
+
+
+def _contract_proper_cluster_graph(
+    vertices: Set,
+    edges: Dict,
+    edge_weights: Dict[FrozenSet, float],
+    max_possible_weight: float,
+):
+    # Construct a new graph containing only the edges of maximal weight.
+    # The components of this graph are the vertices following contraction
+    max_vertices = set()
+    max_edges = {}
+    for edge, weight in edge_weights.items():
+        if math.isclose(weight, max_possible_weight):
+            # Add the connecting vertices to the graph
+            for v in edge:
+                max_vertices.add(v)
+                if v not in max_edges:
+                    max_edges[v] = set()
+            u, v = edge
+            max_edges[u].add(v)
+            max_edges[v].add(u)
+
+    # The components of the new graph are the new vertices after contraction
+    contractions = _get_graph_components(max_vertices, max_edges)
+
+    # Generate a mapping from the old to new vertices
+    vertex_to_contraction = {}
+    for contraction in contractions:
+        for vertex in contraction:
+            vertex_to_contraction[vertex] = frozenset(contraction)
+
+    # Contract the graph
+    new_edge_weights = {}
+    for contraction in contractions:
+        # Remove the contraction from the graph
+        vertices.difference_update(contraction)
+        new_vertex = frozenset(contraction)
+
+        for vertex in contraction:
+            for neighbour in edges[vertex]:
+                # If the neighbour is a part of the contraction
+                # Simply delete the edge weight (edge will be deleted later)
+                if neighbour in new_vertex:
+                    e = frozenset((vertex, neighbour))
+                    if e in edge_weights:
+                        del edge_weights[e]
+                    continue
+
+                # Otherwise we are connecting to something outside
+                # of this contraction
+                new_edge_pair = frozenset(
+                    (
+                        new_vertex,
+                        vertex_to_contraction.get(neighbour, neighbour),
+                    )  # Be careful if the neighbour is in a different contraction
+                )
+
+                # There may be multiple edges to a vertex outside of the contraction
+                # Store in a list for now TODO: Are the weights all the same?
+                if new_edge_pair not in new_edge_weights:
+                    new_edge_weights[new_edge_pair] = []
+                new_edge_weights[new_edge_pair].append(
+                    edge_weights[frozenset((vertex, neighbour))]
+                )
+
+                # Delete the edge and edge weight with the neighbout
+                edges[neighbour].remove(vertex)
+                del edge_weights[frozenset((vertex, neighbour))]
+            # Handled all neighbours of the vertex,
+            # can now delete the edges for this vertex
+            del edges[vertex]
+
+    # Can safely add the new vertices
+    for contraction in contractions:
+        vertices.add(contraction)
+        if contraction not in edges:  # Unnecessary if statement, but keeping consistent
+            edges[contraction] = set()
+
+    for edge, weight in new_edge_weights.items():
+        u, v = edge
+        edges[u].add(v)
+        edges[v].add(u)
+
+        if len(new_edge_weights[edge]) == 1:
+            edge_weights[edge] = new_edge_weights[edge][0]
+        else:
+            # TODO: replace parallel edges
+            # with a single edge whose weight
+            # is the sum of weights of the trees
+            # that have a proper cluster containing
+            # the end points of at least one edge in that
+            # parallel class. I think previously I accidentally
+            # did an "and" rather than the wanted "or"
+            edge_weights[edge] = NotImplemented
+
+            # pseudocode:
+            # Iterate over trees and edge weights
+            # Remember, both edge's vertices could possible be contracted
+            # Get intersection of edge's vertices with tips of given tree
+            # Iterate over possible combination - if found add weight and continue
+            # Possible shortcut, iterate over the immediate children of the tree.
+            # Itersection of leaves on that side with both vertices. If both of length
+            # greater than 0, proper cluster so include
+            raise NotImplementedError
+
+    raise NotImplementedError
 
 
 def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
