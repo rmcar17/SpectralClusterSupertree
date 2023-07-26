@@ -61,6 +61,11 @@ def spectral_cluster_supertree(
         # TODO: If there the graph is connected, then need to perform spectral clustering
         # to find "best" components
 
+        # Modifies the proper cluster graph inplace
+        _contract_proper_cluster_graph(
+            pcg_vertices, pcg_edges, pcg_weights, sum(weights)
+        )
+
         raise NotImplementedError
 
     # The child trees corresponding to the components of the graph
