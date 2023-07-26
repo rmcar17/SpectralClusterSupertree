@@ -1,4 +1,14 @@
-from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import (
+    Collection,
+    Dict,
+    FrozenSet,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 from cogent3.core.tree import TreeBuilder, TreeNode
 
@@ -38,8 +48,6 @@ def spectral_cluster_supertree(
 
     # If there are less than or only two names, can instantly return a tree
     if len(pcg_vertices) <= 2:
-        # TODO: if there is only one name, do I actually need to return
-        # A single tree node instead? Probably. Currently is root->single.
         tree = _tip_names_to_tree(pcg_vertices)
         return tree
 
@@ -94,7 +102,7 @@ def spectral_cluster_supertree(
     return supertree
 
 
-def _connect_trees(trees: Iterable[TreeNode]) -> TreeNode:
+def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
     """
     Connects the input trees by making them adjacent to a new root.
 
@@ -104,6 +112,9 @@ def _connect_trees(trees: Iterable[TreeNode]) -> TreeNode:
     Returns:
         TreeNode: A tree connecting all the input trees
     """
+    if len(trees) == 1:
+        (one,) = trees  # Unpack only tree
+        return one
     tree_builder = TreeBuilder(constructor=TreeNode).edge_from_edge
     return tree_builder(None, trees)
 
@@ -137,7 +148,7 @@ def _generate_induced_trees_with_weights(
         # there is no point inducing (no proper clusters)
         if len(names.intersection(tree.get_tip_names())) < 2:
             continue
-        induced_trees.append(tree.get_sub_tree(names))
+        induced_trees.append(tree.get_sub_tree(names, ignore_missing=True))
         new_weights.append(weight)
 
     return induced_trees, new_weights
@@ -248,7 +259,7 @@ def _tip_names_to_tree(tip_names: Iterable) -> TreeNode:
         constructor=TreeNode
     ).create_edge  # Incorrectly causes "type error" on input TreeNode due to type detection system
     tips = [tree_builder([], tip_name, {}) for tip_name in tip_names]
-    tree = tree_builder(
-        tips, "root", {}
-    )  # Might need to change "root" to something else, it is likely only temporarily the root.
-    return tree
+    # tree = tree_builder(
+    #     tips, "root", {}
+    # )  # Might need to change "root" to something else, it is likely only temporarily the root.
+    return _connect_trees(tips)
