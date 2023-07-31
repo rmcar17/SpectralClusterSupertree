@@ -11,7 +11,9 @@ from typing import (
     Tuple,
 )
 
+import numpy as np
 from cogent3.core.tree import TreeBuilder, TreeNode
+from sklearn.cluster import SpectralClustering
 
 
 def spectral_cluster_supertree(
@@ -66,7 +68,7 @@ def spectral_cluster_supertree(
             pcg_vertices, pcg_edges, pcg_weights, trees, weights
         )
 
-        raise NotImplementedError
+        components = spectral_cluster_graph(pcg_vertices, pcg_weights)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
@@ -107,6 +109,41 @@ def spectral_cluster_supertree(
     # Connect the child trees by making adjacent to a new root.
     supertree = _connect_trees(child_trees)
     return supertree
+
+
+def spectral_cluster_graph(
+    vertices: Set, edge_weights: Dict[FrozenSet, float]
+) -> List[Set]:
+    # TODO: assign labels also allows kmeans, and something else which looks less useful
+    # Do they have an effect on the performance?
+    sc = SpectralClustering(2, affinity="precomputed", assign_labels="discretize")
+
+    # Order vertices
+    vertex_list = list(vertices)
+
+    # TODO: Previously I restricted the of the weights of the edges
+    # to be ints, and I used a numpy array with dtype=np.int8 to save
+    # memory. Should I somehow choose whether to use a sparse matrix
+    # or not. Should I move back from now float to int? Is there some
+    # kind of automatic selection that can be performed?
+    edges = np.zeros((len(vertex_list), len(vertex_list)))
+
+    # TODO: This is horridly inefficient. Generate mapping from vertices to indices
+    # and iterate over edges instead as this will likely be semi-sparse
+    for i, v1 in enumerate(vertex_list):
+        for j, v2 in enumerate(vertex_list):
+            edges[i, j] = edge_weights.get((frozenset((v1, v2))), 0)
+
+    idxs = sc.fit_predict(edges)
+
+    partition = [set(), set()]
+    for vertex, idx in zip(vertex_list, idxs):
+        if isinstance(vertex, frozenset):
+            partition[idx].update(vertex)
+        else:
+            partition[idx].add(vertex)
+
+    return partition
 
 
 def _contract_proper_cluster_graph(
