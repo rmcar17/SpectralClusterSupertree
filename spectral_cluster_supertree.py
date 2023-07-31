@@ -63,7 +63,7 @@ def spectral_cluster_supertree(
 
         # Modifies the proper cluster graph inplace
         _contract_proper_cluster_graph(
-            pcg_vertices, pcg_edges, pcg_weights, sum(weights)
+            pcg_vertices, pcg_edges, pcg_weights, trees, weights
         )
 
         raise NotImplementedError
@@ -113,8 +113,11 @@ def _contract_proper_cluster_graph(
     vertices: Set,
     edges: Dict,
     edge_weights: Dict[FrozenSet, float],
-    max_possible_weight: float,
-):
+    trees: Sequence[TreeNode],
+    weights: Sequence[float],
+) -> None:
+    max_possible_weight = sum(weights)
+
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
     max_vertices = set()
@@ -166,7 +169,7 @@ def _contract_proper_cluster_graph(
                 )
 
                 # There may be multiple edges to a vertex outside of the contraction
-                # Store in a list for now TODO: Are the weights all the same?
+                # TODO: Perhaps don't store in list and have a seperate step later
                 if new_edge_pair not in new_edge_weights:
                     new_edge_weights[new_edge_pair] = []
                 new_edge_weights[new_edge_pair].append(
@@ -186,6 +189,7 @@ def _contract_proper_cluster_graph(
         if contraction not in edges:  # Unnecessary if statement, but keeping consistent
             edges[contraction] = set()
 
+    # Add the new edges to the graph
     for edge, weight in new_edge_weights.items():
         u, v = edge
         edges[u].add(v)
@@ -194,26 +198,28 @@ def _contract_proper_cluster_graph(
         if len(new_edge_weights[edge]) == 1:
             edge_weights[edge] = new_edge_weights[edge][0]
         else:
-            # TODO: replace parallel edges
-            # with a single edge whose weight
-            # is the sum of weights of the trees
-            # that have a proper cluster containing
-            # the end points of at least one edge in that
-            # parallel class. I think previously I accidentally
-            # did an "and" rather than the wanted "or"
-            edge_weights[edge] = NotImplemented
+            edge_weight = 0
 
-            # pseudocode:
-            # Iterate over trees and edge weights
-            # Remember, both edge's vertices could possible be contracted
-            # Get intersection of edge's vertices with tips of given tree
-            # Iterate over possible combination - if found add weight and continue
-            # Possible shortcut, iterate over the immediate children of the tree.
-            # Itersection of leaves on that side with both vertices. If both of length
-            # greater than 0, proper cluster so include
-            raise NotImplementedError
+            # Make sure if an edge is not contracted, it behaves as if it were a set
+            # TODO: consider making all vertices a set so consistency doesn't cause issues
+            # This may cause lookup annoyances however so perhaps not.
+            if not isinstance(u, frozenset):
+                u = frozenset((u,))
+            if not isinstance(v, frozenset):
+                v = frozenset((v,))
 
-    raise NotImplementedError
+            for tree, tree_weight in zip(trees, weights):
+                for child in tree:
+                    # TODO: Is this precisely equivalent to the paper (re: parallel edges... particularly when both endpoints are contractions). Think it works out the same..
+                    # TODO: efficiency here can be improved as we only need to find one element in common
+                    if (
+                        len(u.intersection(child.get_tip_names())) > 0
+                        and len(v.intersection(child.get_tip_names())) > 0
+                    ):
+                        # The tree supports the endpoints belonging to a proper cluster
+                        edge_weight += tree_weight
+
+            edge_weights[edge] = edge_weight
 
 
 def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
