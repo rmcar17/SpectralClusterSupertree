@@ -114,6 +114,26 @@ def spectral_cluster_supertree(
 def spectral_cluster_graph(
     vertices: Set, edge_weights: Dict[FrozenSet, float]
 ) -> List[Set]:
+    """
+    Given the proper cluster graph, perform Spectral Clustering
+    to find the best partition of the vertices.
+
+    TODO: I asked earlier what to do as this always returns
+    a bipartition, though the min-cut method could possibly
+    return an arbitrary partition (every edge on any min-cut)
+    was removed. Could it be possible to access the eigenvector
+    to find vertices that don't neatly belong to either class?
+    Some method with k-means to work out optimal number of classes
+    (probably not because the normal case should be two classes).
+
+    Args:
+        vertices (Set): The set of vertices
+        edge_weights (Dict[FrozenSet, float]): The weights of the edges
+
+    Returns:
+        List[Set]: A bipartition of the vertices
+    """
+
     # TODO: assign labels also allows kmeans, and something else which looks less useful
     # Do they have an effect on the performance?
     sc = SpectralClustering(2, affinity="precomputed", assign_labels="discretize")
@@ -138,7 +158,7 @@ def spectral_cluster_graph(
 
     partition = [set(), set()]
     for vertex, idx in zip(vertex_list, idxs):
-        if isinstance(vertex, frozenset):
+        if isinstance(vertex, FrozenSet):
             partition[idx].update(vertex)
         else:
             partition[idx].add(vertex)
@@ -153,6 +173,26 @@ def _contract_proper_cluster_graph(
     trees: Sequence[TreeNode],
     weights: Sequence[float],
 ) -> None:
+    """
+    This method operates in-place.
+
+    Given the proper cluster graph, contract every edge of maximal
+    weight (sum of the weights for the input trees).
+
+    The vertices for the contracted edges is a frozenset containing
+    the old vertices as elements.
+
+    The weights for the parallel classes of edges formed through
+    contraction are calculated by the sum of the weights of the trees
+    that support at least one of those edges.
+
+    Args:
+        vertices (Set): The set of vertices
+        edges (Dict): A mapping of vertices to other vertices they connect
+        edge_weights (Dict[FrozenSet, float]): The weight for each edge between two vertices
+        trees (Sequence[TreeNode]): The input trees
+        weights (Sequence[float]): The weights of the input trees
+    """
     max_possible_weight = sum(weights)
 
     # Construct a new graph containing only the edges of maximal weight.
