@@ -1,3 +1,12 @@
+"""
+Spectral Cluster Supertree
+
+Link to Original Min-Cut Supertree: https://pdf.sciencedirectassets.com/271602/1-s2.0-S0166218X00X00820/1-s2.0-S0166218X0000202X/main.pdf?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEB0aCXVzLWVhc3QtMSJHMEUCIDx6%2Bq%2BMp49c%2B0DpWKQGgT41CHeS7uvmhrGcnT%2Fz4sUiAiEApxQbkKmRQpmX%2FAryjbpCO%2FjAeMgT3PerU%2B%2Bait5LsRgqvAUItv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAFGgwwNTkwMDM1NDY4NjUiDAKOivgr26PPbbzj3SqQBWc4KFtzM4hABM7UT1TphDNvU9t6FJ4Af5L3f4sB6BfJKBaaCOjYAIzqbe1QtXJ3fQH8JEi%2F1WTsE4PKYwhEho3%2BNxaOAKtUKs%2F5QRwq67jaA9DrXAGsLnpylbrh%2FJh6kSxLjwoOEal7Id09q%2Fbu9YjFDex0J8NjnEdtcrX14QGijoErz9w9imlH8v3SFZdlomVY3HG3XY6rRUavnditiiHIS1zoKMQ2%2FkLa%2FlvUQlqdEgypifq4ca5mG%2F5BuIXDAYt04y%2B3khd6IIsvmi6IURu5zUAK57jOfx9gSCGjo%2B7EUX1wmkHoNsQEZhPVyReNwDFtSyHV0vFVZnrpHdAnY1ccUe%2FZKq3sJF59Fz4btvekrkHquBghvoroKBcdcAPT2ATO2qCKk1c0RHUSSr%2B6xBJgNNThzlwDQM0j56GZR64h%2FRyUk6MmNrGG7Hupt4r8N0pIhB1dmTBHJPYKU%2FxfrMhGvOzfwQphBt%2BDqFiULm74k3WxQrw5zc%2FofHbUWouyFUMo%2BgX7UCcXbfO9qtqJ4OFRQ%2BP7URAtthmEEPl0e8mJz7gcaeeEqj6%2BFsZ7m4LPYrVAww3x5qVQqtbxBMQPtxpwtw3rKaSdxjt6aNX39%2F9Pl9x7Pk8NS1VgHA2jLPdVghDfTUhPG8QsWFWbb6vBdXkIkeFed9O51F2qol95bNzm5sS845JExWl0SIPSm0T4fwHCCUUn%2BwCC5lJSVYrvG5o2DwW93UvPuSR3zFkxR3pLQd%2FZp2%2B%2BNLumVOR%2F3XLBQ7AKvNlko9w7W1LWChYy0QEOWPurDNAF0mD%2FAPDstzx%2Bqygik7ra2DmK%2FhArHqvr%2F1iShZzRSFIW1MJNwDEjc4alsK9JG1yWAPfH4SWZ2dSkMJX5nKYGOrEBIbVfvnec7DfEZb2h9sF15i6N%2B637BNtOuI6O0kUnYrNq38qgxPKriSHaL3Y5Oa5WqczDPtD17tO7q%2F7bRFQSuj%2FfpMOu3UvoLK2rmTw3B6RE0ZARjfaOibvJ8ZJbF8KW%2BrsgsuZPo2QMERH2gxxM%2BEnKfPWFIsnhZ%2FSJHg9vPKvihxKqaYaE41nCTMqjoX7XH0fIwjoL5FxvuGexX4dsTMHvx2Ln4nk0ECYOQjVeMgqR&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230731T053622Z&X-Amz-SignedHeaders=host&X-Amz-Expires=300&X-Amz-Credential=ASIAQ3PHCVTYQM5ULNKL%2F20230731%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=be63c1722fca0ec03d9d663d338b01c2f26c01b56fbda122b137951653187398&hash=c311b130010be1c6d77894cdf00d9f11153a4fd4bc34f6772298868bfbe13043&host=68042c943591013ac2b2430a89b270f6af2c76d8dfd086a07176afe7c76c2c61&pii=S0166218X0000202X&tid=spdf-f88ba228-921f-40f5-81bf-9d446bbb8f7a&sid=b2a930266e4f88448779cef50668c773cc80gxrqa&type=client&tsoh=d3d3LnNjaWVuY2VkaXJlY3QuY29t&ua=07165805055450000402&rr=7ef37bba3bb955bf&cc=au
+Link to Modified Min-Cut Supertree: https://www.researchgate.net/profile/Roderic-Page/publication/226374714_Modified_Mincut_Supertrees/links/0deec536b8f1011d10000000/Modified-Mincut-Supertrees.pdf
+
+(I appreciate that Original and Modified are of the same length)
+"""
+
 import math
 from typing import (
     Collection,
@@ -136,7 +145,7 @@ def spectral_cluster_graph(
 
     # TODO: assign labels also allows kmeans, and something else which looks less useful
     # Do they have an effect on the performance?
-    sc = SpectralClustering(2, affinity="precomputed", assign_labels="discretize")
+    sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans")
 
     # Order vertices
     vertex_list = list(vertices)
@@ -262,9 +271,10 @@ def _contract_proper_cluster_graph(
 
     # Can safely add the new vertices
     for contraction in contractions:
-        vertices.add(contraction)
-        if contraction not in edges:  # Unnecessary if statement, but keeping consistent
-            edges[contraction] = set()
+        c = frozenset(contraction)
+        vertices.add(c)
+        if c not in edges:  # Unnecessary if statement, but keeping consistent
+            edges[c] = set()
 
     # Add the new edges to the graph
     for edge, weight in new_edge_weights.items():
