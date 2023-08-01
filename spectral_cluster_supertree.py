@@ -5,6 +5,15 @@ Link to Original Min-Cut Supertree: https://pdf.sciencedirectassets.com/271602/1
 Link to Modified Min-Cut Supertree: https://www.researchgate.net/profile/Roderic-Page/publication/226374714_Modified_Mincut_Supertrees/links/0deec536b8f1011d10000000/Modified-Mincut-Supertrees.pdf
 
 (I appreciate that Original and Modified are of the same length)
+
+Potential dataset http://www.cs.utexas.edu/~phylo/datasets/supertrees.html
+(Use wayback machine)
+Relevant paper: https://academic.oup.com/sysbio/article/63/4/566/2848417?login=false
+
+SMIDGen
+
+https://sites.google.com/eng.ucsd.edu/datasets/dactalsuperfine
+
 """
 
 import math
