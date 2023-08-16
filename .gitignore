@@ -4,6 +4,10 @@
 # data
 data/*
 
+# superfine
+superfine/*
+SuperFine/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

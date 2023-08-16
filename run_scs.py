@@ -4,6 +4,7 @@ from cogent3 import make_tree
 from cogent3.core.tree import TreeNode, PhyloNode
 import os
 from spectral_cluster_supertree import spectral_cluster_supertree
+import time
 
 
 def parse_trees(file_path: str) -> List[PhyloNode]:
@@ -11,7 +12,7 @@ def parse_trees(file_path: str) -> List[PhyloNode]:
     with open(file_path, "r") as f:
         for line in f:
             trees.append(make_tree(line.strip()))
-            print(line.strip())
+            # print(line.strip())
     return trees
 
 
@@ -28,18 +29,17 @@ def print_tree_stats(trees: List[PhyloNode]):
     all_names = set()
     for tree in trees:
         all_names.update(tree.get_tip_names())
-        print(len(tree.get_tip_names()))
 
     print(f"Trees: {len(trees)} Taxa: {len(all_names)}")
 
 
 def output_supertree(supertree: TreeNode):
     print(supertree)
-    print(len(supertree.get_tip_names()))
+    # print(len(supertree.get_tip_names()))
 
 
 def create_supertree(trees: List[PhyloNode]) -> None:
-    print_tree_stats(trees)
+    # print_tree_stats(trees)
     supertree = spectral_cluster_supertree(trees)
     output_supertree(supertree)
 
@@ -57,7 +57,7 @@ def create_simulated_supertree(file):
 def create_simulated_supertrees(taxa: int, density: int):
     path = f"data/superfine/{taxa}-taxa/{density}/"
     for file in os.listdir(path):
-        print(file)
+        # print(file)
         if file.endswith(".source_trees"):
             create_simulated_supertree(path + file)
 
@@ -66,6 +66,7 @@ if __name__ == "__main__":
     option = sys.argv[1]  # e=Empirical, s=Simulated
     assert option in ["e", "s"]
 
+    start_time = time.time()
     if option == "e":
         path_to_trees = sys.argv[2]
         create_empirical_supertree(path_to_trees)
@@ -73,3 +74,5 @@ if __name__ == "__main__":
         taxa = int(sys.argv[2])
         density = int(sys.argv[3])
         create_simulated_supertrees(taxa, density)
+    end_time = time.time()
+    print(f"Completed in {end_time - start_time:.2f} seconds.")
