@@ -25,6 +25,7 @@ Finally found superfine https://github.com/dtneves/SuperFine
 """
 
 import math
+import time
 from typing import (
     Collection,
     Dict,
@@ -80,21 +81,31 @@ def spectral_cluster_supertree(
         tree = _tip_names_to_tree(pcg_vertices)
         return tree
 
-    # TODO: Construct proper cluster graph... perform spectral clustering
+    print("STARTING PCG")
+    start = time.time()
     pcg_edges, pcg_weights = _proper_cluster_graph_edges(pcg_vertices, trees, weights)
+    print("TOOK", time.time() - start)
 
+    print("STARTING COMP")
+    start = time.time()
     components = _get_graph_components(pcg_vertices, pcg_edges)
+    print("TOOK", time.time() - start)
 
     if len(components) == 1:
         # TODO: If there the graph is connected, then need to perform spectral clustering
         # to find "best" components
 
         # Modifies the proper cluster graph inplace
+        print("START CONTRACT")
+        start = time.time()
         _contract_proper_cluster_graph(
             pcg_vertices, pcg_edges, pcg_weights, trees, weights
         )
+        print("TOOK", time.time() - start)
 
+        print("START CLUSTER")
         components = spectral_cluster_graph(pcg_vertices, pcg_weights)
+        print("TOOK", time.time() - start)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
@@ -176,10 +187,13 @@ def spectral_cluster_graph(
 
     # TODO: This is horridly inefficient. Generate mapping from vertices to indices
     # and iterate over edges instead as this will likely be semi-sparse
+    # print("START SLOW?")
+    start = time.time()
     for i, v1 in enumerate(vertex_list):
         for j, v2 in enumerate(vertex_list):
             edges[i, j] = edge_weights.get((frozenset((v1, v2))), 0)
-
+    # print("SLOW? TOOK", time.time() - start)
+    # print(f"SPARSITY: {1-np.count_nonzero(edges)/edges.size}")
     idxs = sc.fit_predict(edges)
 
     partition = [set(), set()]
@@ -437,10 +451,14 @@ def _proper_cluster_graph_edges(
     for name in pcg_vertices:
         edges[name] = set()
 
+    total = 0
+
     for tree, weight in zip(trees, weights):
         # TODO: Should I error if more than two children?
         for side in tree:
             names = side.get_tip_names()
+            start = time.time()
+            print("Len", len(names))
             for i in range(1, len(names)):
                 for j in range(i):
                     edges[names[i]].add(names[j])
@@ -448,7 +466,9 @@ def _proper_cluster_graph_edges(
 
                     edge = frozenset((names[i], names[j]))
                     edge_weights[edge] = edge_weights.get(edge, 0) + weight
-
+            total += time.time() - start
+    print("CONSTRUCTION PART", total)
+    print(len(trees))
     return edges, edge_weights
 
 
