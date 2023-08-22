@@ -56,9 +56,11 @@ class TaskDistributor:
                 conn.send(task)
                 busy_conns.append(conn)
 
-            finished: List = wait(busy_conns)
+            finished = wait(busy_conns)
             for conn in finished:
+                assert isinstance(conn, Connection)
                 result = conn.recv()
+                
 
 
 class Worker:
