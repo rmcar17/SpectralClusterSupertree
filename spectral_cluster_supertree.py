@@ -328,7 +328,6 @@ def _contract_proper_cluster_graph(
 
             for tree, tree_weight in zip(trees, weights):
                 for child in tree:
-                    # TODO: Is this precisely equivalent to the paper (re: parallel edges... particularly when both endpoints are contractions). Think it works out the same..
                     # TODO: efficiency here can be improved as we only need to find one element in common
                     if (
                         len(u.intersection(child.get_tip_names())) > 0
@@ -451,14 +450,14 @@ def _proper_cluster_graph_edges(
     for name in pcg_vertices:
         edges[name] = set()
 
-    total = 0
+    # total = 0
 
     for tree, weight in zip(trees, weights):
         # TODO: Should I error if more than two children?
         for side in tree:
             names = side.get_tip_names()
-            start = time.time()
-            print("Len", len(names))
+            # start = time.time()
+            # print("Len", len(names))
             for i in range(1, len(names)):
                 for j in range(i):
                     edges[names[i]].add(names[j])
@@ -466,9 +465,9 @@ def _proper_cluster_graph_edges(
 
                     edge = frozenset((names[i], names[j]))
                     edge_weights[edge] = edge_weights.get(edge, 0) + weight
-            total += time.time() - start
-    print("CONSTRUCTION PART", total)
-    print(len(trees))
+            # total += time.time() - start
+    # print("CONSTRUCTION PART", total)
+    # print(len(trees))
     return edges, edge_weights
 
 
