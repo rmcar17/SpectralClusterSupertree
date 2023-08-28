@@ -3,7 +3,7 @@ from typing import List
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode, PhyloNode
 import os
-from spectral_cluster_supertree import spectral_cluster_supertree
+from tu_spectral_cluster_supertree import spectral_cluster_supertree, all_total
 import time
 
 
@@ -75,4 +75,6 @@ if __name__ == "__main__":
         density = int(sys.argv[3])
         create_simulated_supertrees(taxa, density)
     end_time = time.time()
-    print(f"Completed in {end_time - start_time:.2f} seconds.")
+    print(
+        f"Completed in {end_time - start_time:.2f} seconds. {end_time-start_time-all_total[0]}"
+    )

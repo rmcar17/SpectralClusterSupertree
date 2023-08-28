@@ -42,6 +42,8 @@ import numpy as np
 from cogent3.core.tree import TreeBuilder, TreeNode
 from sklearn.cluster import SpectralClustering
 
+all_total = [0.0]
+
 
 def spectral_cluster_supertree(
     trees: Sequence[TreeNode], weights: Optional[Sequence[float]] = None
@@ -85,7 +87,9 @@ def spectral_cluster_supertree(
 
     print("STARTING PCG")
     start = time.time()
-    pcg_edges, pcg_weights = _proper_cluster_graph_edges(pcg_vertices, trees, weights)
+    pcg_edges, pcg_weights, max_weights = _proper_cluster_graph_edges(
+        pcg_vertices, trees, weights
+    )
     print("TOOK", time.time() - start)
 
     print("STARTING COMP")
@@ -101,11 +105,13 @@ def spectral_cluster_supertree(
         print("START CONTRACT")
         start = time.time()
         _contract_proper_cluster_graph(
-            pcg_vertices, pcg_edges, pcg_weights, trees, weights
+            pcg_vertices, pcg_edges, pcg_weights, max_weights, trees, weights
         )
+        all_total[0] += time.time() - start
         print("TOOK", time.time() - start)
 
         print("START CLUSTER")
+        start = time.time()
         components = spectral_cluster_graph(pcg_vertices, pcg_weights)
         print("TOOK", time.time() - start)
 
@@ -183,7 +189,7 @@ def spectral_cluster_graph(
 
     # TODO: assign labels also allows kmeans, and something else which looks less useful
     # Do they have an effect on the performance?
-    sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans")
+    sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans", n_jobs=1)
 
     # Order vertices
     vertex_list = list(vertices)
@@ -217,6 +223,7 @@ def _contract_proper_cluster_graph(
     vertices: Set,
     edges: Dict,
     edge_weights: Dict[Tuple, float],
+    max_weights: Dict[Tuple, float],
     trees: Sequence[TreeNode],
     weights: Sequence[float],
 ) -> None:
@@ -240,13 +247,15 @@ def _contract_proper_cluster_graph(
         trees (Sequence[TreeNode]): The input trees
         weights (Sequence[float]): The weights of the input trees
     """
-    max_possible_weight = sum(weights)
+    # max_possible_weight = sum(weights)
 
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
     max_vertices = set()
     max_edges = {}
     for edge, weight in edge_weights.items():
+        u, v = edge
+        max_possible_weight = max(max_weights[u], max_weights[v])
         if math.isclose(weight, max_possible_weight):
             # Add the connecting vertices to the graph
             for v in edge:
@@ -433,7 +442,7 @@ def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
 
 def _proper_cluster_graph_edges(
     pcg_vertices: Set, trees: Sequence[TreeNode], weights: Sequence[float]
-) -> Tuple[Dict[Tuple, Set[Tuple]], Dict[Tuple, float]]:
+) -> Tuple[Dict[Tuple, Set[Tuple]], Dict[Tuple, float], Dict[Tuple, float]]:
     """Constructs a proper cluster graph for a collection of weighted trees.
 
     For a tree, two leaves belong to a proper cluster if the path connecting
@@ -455,9 +464,11 @@ def _proper_cluster_graph_edges(
     """
     edges = {}
     edge_weights = {}
+    max_weights = {}  # Max weight possible for each vertex
 
     for vertex in pcg_vertices:
         edges[vertex] = set()
+        max_weights[vertex] = 0
 
     # total = 0
 
@@ -467,8 +478,9 @@ def _proper_cluster_graph_edges(
             names = side.get_tip_names()
             # start = time.time()
             # print("Len", len(names))
-            for i in range(1, len(names)):
+            for i in range(0, len(names)):
                 ni = (names[i],)
+                max_weights[ni] += weight
                 for j in range(i):
                     nj = (names[j],)
                     edges[ni].add(nj)
@@ -479,7 +491,7 @@ def _proper_cluster_graph_edges(
             # total += time.time() - start
     # print("CONSTRUCTION PART", total)
     # print(len(trees))
-    return edges, edge_weights
+    return edges, edge_weights, max_weights
 
 
 def edge_tuple(v1, v2):
