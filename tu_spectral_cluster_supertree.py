@@ -42,8 +42,6 @@ import numpy as np
 from cogent3.core.tree import TreeBuilder, TreeNode
 from sklearn.cluster import SpectralClustering
 
-all_total = [0.0]
-
 
 def spectral_cluster_supertree(
     trees: Sequence[TreeNode], weights: Optional[Sequence[float]] = None
@@ -85,35 +83,35 @@ def spectral_cluster_supertree(
 
     pcg_vertices = set((name,) for name in all_names)
 
-    print("STARTING PCG")
-    start = time.time()
+    # print("STARTING PCG")
+    # start = time.time()
     pcg_edges, pcg_weights, max_weights = _proper_cluster_graph_edges(
         pcg_vertices, trees, weights
     )
-    print("TOOK", time.time() - start)
+    # print("TOOK", time.time() - start)
 
-    print("STARTING COMP")
-    start = time.time()
+    # print("STARTING COMP")
+    # start = time.time()
     components = _get_graph_components(pcg_vertices, pcg_edges)
-    print("TOOK", time.time() - start)
+    # print("TOOK", time.time() - start)
 
     if len(components) == 1:
         # TODO: If there the graph is connected, then need to perform spectral clustering
         # to find "best" components
 
         # Modifies the proper cluster graph inplace
-        print("START CONTRACT")
-        start = time.time()
+        # print("START CONTRACT")
+        # start = time.time()
         _contract_proper_cluster_graph(
             pcg_vertices, pcg_edges, pcg_weights, max_weights, trees, weights
         )
-        all_total[0] += time.time() - start
-        print("TOOK", time.time() - start)
+        # all_total[0] += time.time() - start
+        # print("TOOK", time.time() - start)
 
-        print("START CLUSTER")
-        start = time.time()
+        # print("START CLUSTER")
+        # start = time.time()
         components = spectral_cluster_graph(pcg_vertices, pcg_weights)
-        print("TOOK", time.time() - start)
+        # print("TOOK", time.time() - start)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
@@ -204,7 +202,7 @@ def spectral_cluster_graph(
     # TODO: This is horridly inefficient. Generate mapping from vertices to indices
     # and iterate over edges instead as this will likely be semi-sparse
     # print("START SLOW?")
-    start = time.time()
+    # start = time.time()
     for i, v1 in enumerate(vertex_list):
         for j, v2 in enumerate(vertex_list):
             edges[i, j] = edge_weights.get(edge_tuple(v1, v2), 0)
