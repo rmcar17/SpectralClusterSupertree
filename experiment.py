@@ -55,5 +55,44 @@ def simulated_experiment(taxa, density):
         break
 
 
+def report(source_tree_file, model_tree_file):
+    result_sup = subprocess.run(
+        ["./run_superfine.sh", source_tree_file],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    result_scs = subprocess.run(
+        ["./run_scs.sh", source_tree_file],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    try:
+        sup_tree = (
+            make_tree(result_sup.stdout.decode("utf-8").strip())
+            .bifurcating()
+            .unrooted()
+        )
+    except:
+        sup_tree = None
+        print(result_sup.stdout.decode("utf-8").strip())
+    scs_tree = (
+        make_tree(result_scs.stdout.decode("utf-8").strip()).bifurcating().unrooted()
+    )
+    print("SUPERFINE:", sup_tree)
+    print("SCS:", scs_tree)
+
+    with open(model_tree_file, "r") as f:
+        model = make_tree(f.read().strip()).bifurcating().unrooted()
+
+    if sup_tree is not None:
+        print(sup_tree.lin_rajan_moret(scs_tree))
+        print(model.lin_rajan_moret(sup_tree))
+    print(model.lin_rajan_moret(scs_tree))
+
+
 if __name__ == "__main__":
-    simulated_experiment(100, 100)
+    # simulated_experiment(100, 20)
+    file = "simulated_trees/simulated_tree_data/20"
+    report(file + ".source_trees", file + ".model_tree")

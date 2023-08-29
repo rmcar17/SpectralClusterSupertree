@@ -65,6 +65,7 @@ def spectral_cluster_supertree(
     """
 
     assert len(trees) >= 1, "there must be at least one tree"
+    # print("CALLING ON", trees)
 
     # Input trees are of equal weight if none is specified
     if weights is None:
@@ -123,6 +124,8 @@ def spectral_cluster_supertree(
     # Slightly frustrating since spectral clustering will
     # always generate two components.
 
+    # print("GOT COMPONENTS", components)
+
     for component in components:
         component = component_to_names_set(component)
         # Trivial case for if the size of the component is <=2
@@ -135,9 +138,11 @@ def spectral_cluster_supertree(
         # and recursively call SCS
 
         # Note, inducing could possible remove trees.
+        # print("BEFORE INDUCING", trees, "ON", component)
         new_induced_trees, new_weights = _generate_induced_trees_with_weights(
             component, trees, weights
         )
+        # print("AFTER INDUCING", new_induced_trees)
 
         # Find the supertree for the induced trees
         child_trees.append(spectral_cluster_supertree(new_induced_trees, new_weights))

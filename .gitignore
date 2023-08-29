@@ -1,3 +1,6 @@
+# some data files
+simulated_trees/aln_data/*.pkl
+
 # vscode
 .vscode
 
