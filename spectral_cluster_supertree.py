@@ -68,7 +68,7 @@ def spectral_cluster_supertree(
 
     # Input trees are of equal weight if none is specified
     if weights is None:
-        weights = [1000.0 for _ in range(len(trees))]
+        weights = [1.0 for _ in range(len(trees))]
 
     assert len(trees) == len(weights), "trees and weights must be of same length"
 
