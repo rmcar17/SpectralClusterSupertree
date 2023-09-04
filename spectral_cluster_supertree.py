@@ -1,7 +1,7 @@
 """
 Spectral Cluster Supertree
 
-Link to Original Min-Cut Supertree: https://pdf.sciencedirectassets.com/271602/1-s2.0-S0166218X00X00820/1-s2.0-S0166218X0000202X/main.pdf?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEB0aCXVzLWVhc3QtMSJHMEUCIDx6%2Bq%2BMp49c%2B0DpWKQGgT41CHeS7uvmhrGcnT%2Fz4sUiAiEApxQbkKmRQpmX%2FAryjbpCO%2FjAeMgT3PerU%2B%2Bait5LsRgqvAUItv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAFGgwwNTkwMDM1NDY4NjUiDAKOivgr26PPbbzj3SqQBWc4KFtzM4hABM7UT1TphDNvU9t6FJ4Af5L3f4sB6BfJKBaaCOjYAIzqbe1QtXJ3fQH8JEi%2F1WTsE4PKYwhEho3%2BNxaOAKtUKs%2F5QRwq67jaA9DrXAGsLnpylbrh%2FJh6kSxLjwoOEal7Id09q%2Fbu9YjFDex0J8NjnEdtcrX14QGijoErz9w9imlH8v3SFZdlomVY3HG3XY6rRUavnditiiHIS1zoKMQ2%2FkLa%2FlvUQlqdEgypifq4ca5mG%2F5BuIXDAYt04y%2B3khd6IIsvmi6IURu5zUAK57jOfx9gSCGjo%2B7EUX1wmkHoNsQEZhPVyReNwDFtSyHV0vFVZnrpHdAnY1ccUe%2FZKq3sJF59Fz4btvekrkHquBghvoroKBcdcAPT2ATO2qCKk1c0RHUSSr%2B6xBJgNNThzlwDQM0j56GZR64h%2FRyUk6MmNrGG7Hupt4r8N0pIhB1dmTBHJPYKU%2FxfrMhGvOzfwQphBt%2BDqFiULm74k3WxQrw5zc%2FofHbUWouyFUMo%2BgX7UCcXbfO9qtqJ4OFRQ%2BP7URAtthmEEPl0e8mJz7gcaeeEqj6%2BFsZ7m4LPYrVAww3x5qVQqtbxBMQPtxpwtw3rKaSdxjt6aNX39%2F9Pl9x7Pk8NS1VgHA2jLPdVghDfTUhPG8QsWFWbb6vBdXkIkeFed9O51F2qol95bNzm5sS845JExWl0SIPSm0T4fwHCCUUn%2BwCC5lJSVYrvG5o2DwW93UvPuSR3zFkxR3pLQd%2FZp2%2B%2BNLumVOR%2F3XLBQ7AKvNlko9w7W1LWChYy0QEOWPurDNAF0mD%2FAPDstzx%2Bqygik7ra2DmK%2FhArHqvr%2F1iShZzRSFIW1MJNwDEjc4alsK9JG1yWAPfH4SWZ2dSkMJX5nKYGOrEBIbVfvnec7DfEZb2h9sF15i6N%2B637BNtOuI6O0kUnYrNq38qgxPKriSHaL3Y5Oa5WqczDPtD17tO7q%2F7bRFQSuj%2FfpMOu3UvoLK2rmTw3B6RE0ZARjfaOibvJ8ZJbF8KW%2BrsgsuZPo2QMERH2gxxM%2BEnKfPWFIsnhZ%2FSJHg9vPKvihxKqaYaE41nCTMqjoX7XH0fIwjoL5FxvuGexX4dsTMHvx2Ln4nk0ECYOQjVeMgqR&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230731T053622Z&X-Amz-SignedHeaders=host&X-Amz-Expires=300&X-Amz-Credential=ASIAQ3PHCVTYQM5ULNKL%2F20230731%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=be63c1722fca0ec03d9d663d338b01c2f26c01b56fbda122b137951653187398&hash=c311b130010be1c6d77894cdf00d9f11153a4fd4bc34f6772298868bfbe13043&host=68042c943591013ac2b2430a89b270f6af2c76d8dfd086a07176afe7c76c2c61&pii=S0166218X0000202X&tid=spdf-f88ba228-921f-40f5-81bf-9d446bbb8f7a&sid=b2a930266e4f88448779cef50668c773cc80gxrqa&type=client&tsoh=d3d3LnNjaWVuY2VkaXJlY3QuY29t&ua=07165805055450000402&rr=7ef37bba3bb955bf&cc=au
+Link to Original Min-Cut Supertree: https://www.sciencedirect.com/science/article/pii/S0166218X0000202X
 Link to Modified Min-Cut Supertree: https://www.researchgate.net/profile/Roderic-Page/publication/226374714_Modified_Mincut_Supertrees/links/0deec536b8f1011d10000000/Modified-Mincut-Supertrees.pdf
 
 (I appreciate that Original and Modified are of the same length)
@@ -26,17 +26,7 @@ Finally found superfine https://github.com/dtneves/SuperFine
 
 import math
 import time
-from typing import (
-    Collection,
-    Dict,
-    FrozenSet,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-)
+from typing import Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import numpy as np
 from cogent3.core.tree import TreeBuilder, TreeNode
@@ -65,6 +55,7 @@ def spectral_cluster_supertree(
     """
 
     assert len(trees) >= 1, "there must be at least one tree"
+    # print("CALLING ON", trees)
 
     # Input trees are of equal weight if none is specified
     if weights is None:
@@ -74,38 +65,44 @@ def spectral_cluster_supertree(
 
     # The vertices of the proper cluster graph
     # are the names of the tips of all trees
-    pcg_vertices = _get_all_tip_names(trees)
+    all_names = _get_all_tip_names(trees)
 
     # If there are less than or only two names, can instantly return a tree
-    if len(pcg_vertices) <= 2:
-        tree = _tip_names_to_tree(pcg_vertices)
+    if len(all_names) <= 2:
+        tree = _tip_names_to_tree(all_names)
         return tree
 
-    print("STARTING PCG")
-    start = time.time()
-    pcg_edges, pcg_weights = _proper_cluster_graph_edges(pcg_vertices, trees, weights)
-    print("TOOK", time.time() - start)
+    pcg_vertices = set((name,) for name in all_names)
 
-    print("STARTING COMP")
-    start = time.time()
+    # print("STARTING PCG")
+    # start = time.time()
+    pcg_edges, pcg_weights, max_weights = _proper_cluster_graph_edges(
+        pcg_vertices, trees, weights
+    )
+    # print("TOOK", time.time() - start)
+
+    # print("STARTING COMP")
+    # start = time.time()
     components = _get_graph_components(pcg_vertices, pcg_edges)
-    print("TOOK", time.time() - start)
+    # print("TOOK", time.time() - start)
 
     if len(components) == 1:
         # TODO: If there the graph is connected, then need to perform spectral clustering
         # to find "best" components
 
         # Modifies the proper cluster graph inplace
-        print("START CONTRACT")
-        start = time.time()
+        # print("START CONTRACT")
+        # start = time.time()
         _contract_proper_cluster_graph(
-            pcg_vertices, pcg_edges, pcg_weights, trees, weights
+            pcg_vertices, pcg_edges, pcg_weights, max_weights, trees, weights
         )
-        print("TOOK", time.time() - start)
+        # all_total[0] += time.time() - start
+        # print("TOOK", time.time() - start)
 
-        print("START CLUSTER")
+        # print("START CLUSTER")
+        # start = time.time()
         components = spectral_cluster_graph(pcg_vertices, pcg_weights)
-        print("TOOK", time.time() - start)
+        # print("TOOK", time.time() - start)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
@@ -117,7 +114,10 @@ def spectral_cluster_supertree(
     # Slightly frustrating since spectral clustering will
     # always generate two components.
 
+    # print("GOT COMPONENTS", components)
+
     for component in components:
+        component = component_to_names_set(component)
         # Trivial case for if the size of the component is <=2
         # Simply add a tree expressing that
         if len(component) <= 2:
@@ -128,9 +128,11 @@ def spectral_cluster_supertree(
         # and recursively call SCS
 
         # Note, inducing could possible remove trees.
+        # print("BEFORE INDUCING", trees, "ON", component)
         new_induced_trees, new_weights = _generate_induced_trees_with_weights(
             component, trees, weights
         )
+        # print("AFTER INDUCING", new_induced_trees)
 
         # Find the supertree for the induced trees
         child_trees.append(spectral_cluster_supertree(new_induced_trees, new_weights))
@@ -148,8 +150,15 @@ def spectral_cluster_supertree(
     return supertree
 
 
+def component_to_names_set(component: Set[Tuple]) -> Set:
+    names_set = set()
+    for c in component:
+        names_set.update(c)
+    return names_set
+
+
 def spectral_cluster_graph(
-    vertices: Set, edge_weights: Dict[FrozenSet, float]
+    vertices: Set, edge_weights: Dict[Tuple, float]
 ) -> List[Set]:
     """
     Given the proper cluster graph, perform Spectral Clustering
@@ -173,7 +182,7 @@ def spectral_cluster_graph(
 
     # TODO: assign labels also allows kmeans, and something else which looks less useful
     # Do they have an effect on the performance?
-    sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans")
+    sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans", n_jobs=1)
 
     # Order vertices
     vertex_list = list(vertices)
@@ -188,20 +197,17 @@ def spectral_cluster_graph(
     # TODO: This is horridly inefficient. Generate mapping from vertices to indices
     # and iterate over edges instead as this will likely be semi-sparse
     # print("START SLOW?")
-    start = time.time()
+    # start = time.time()
     for i, v1 in enumerate(vertex_list):
         for j, v2 in enumerate(vertex_list):
-            edges[i, j] = edge_weights.get((frozenset((v1, v2))), 0)
+            edges[i, j] = edge_weights.get(edge_tuple(v1, v2), 0)
     # print("SLOW? TOOK", time.time() - start)
     # print(f"SPARSITY: {1-np.count_nonzero(edges)/edges.size}")
     idxs = sc.fit_predict(edges)
 
     partition = [set(), set()]
     for vertex, idx in zip(vertex_list, idxs):
-        if isinstance(vertex, frozenset):
-            partition[idx].update(vertex)
-        else:
-            partition[idx].add(vertex)
+        partition[idx].add(vertex)
 
     return partition
 
@@ -209,7 +215,8 @@ def spectral_cluster_graph(
 def _contract_proper_cluster_graph(
     vertices: Set,
     edges: Dict,
-    edge_weights: Dict[FrozenSet, float],
+    edge_weights: Dict[Tuple, float],
+    max_weights: Dict[Tuple, float],
     trees: Sequence[TreeNode],
     weights: Sequence[float],
 ) -> None:
@@ -233,13 +240,15 @@ def _contract_proper_cluster_graph(
         trees (Sequence[TreeNode]): The input trees
         weights (Sequence[float]): The weights of the input trees
     """
-    max_possible_weight = sum(weights)
+    # max_possible_weight = sum(weights)
 
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
     max_vertices = set()
     max_edges = {}
     for edge, weight in edge_weights.items():
+        u, v = edge
+        max_possible_weight = max(max_weights[u], max_weights[v])
         if math.isclose(weight, max_possible_weight):
             # Add the connecting vertices to the graph
             for v in edge:
@@ -253,59 +262,67 @@ def _contract_proper_cluster_graph(
     # The components of the new graph are the new vertices after contraction
     contractions = _get_graph_components(max_vertices, max_edges)
 
+    # Find the new vertices in processeded_contractions
+    processed_contractions = []
+    for contraction in contractions:
+        processed = []
+        for vertex in contraction:
+            processed.extend(vertex)
+        processed_contractions.append(tuple_sorted(processed))
+
     # Generate a mapping from the old to new vertices
     vertex_to_contraction = {}
-    for contraction in contractions:
+    for contraction, new_vertex in zip(contractions, processed_contractions):
         for vertex in contraction:
-            vertex_to_contraction[vertex] = frozenset(contraction)
+            vertex_to_contraction[vertex] = new_vertex
 
     # Contract the graph
     new_edge_weights = {}
-    for contraction in contractions:
+    for contraction, new_vertex in zip(contractions, processed_contractions):
         # Remove the contraction from the graph
         vertices.difference_update(contraction)
-        new_vertex = frozenset(contraction)
+        vertex_set = set(new_vertex)
 
         for vertex in contraction:
             for neighbour in edges[vertex]:
                 # If the neighbour is a part of the contraction
                 # Simply delete the edge weight (edge will be deleted later)
-                if neighbour in new_vertex:
-                    e = frozenset((vertex, neighbour))
-                    if e in edge_weights:
-                        del edge_weights[e]
+                old_edge = edge_tuple(vertex, neighbour)
+                if vertex_set.issuperset(neighbour):
+                    if old_edge in edge_weights:
+                        del edge_weights[old_edge]
                     continue
 
                 # Otherwise we are connecting to something outside
                 # of this contraction
-                new_edge_pair = frozenset(
-                    (
-                        new_vertex,
-                        vertex_to_contraction.get(neighbour, neighbour),
-                    )  # Be careful if the neighbour is in a different contraction
+                # new_edge_pair = frozenset(
+                #     (
+                #         new_vertex,
+                #         vertex_to_contraction.get(neighbour, neighbour),
+                #     )  # Be careful if the neighbour is in a different contraction
+                # )
+                new_edge_pair = edge_tuple(
+                    new_vertex, vertex_to_contraction.get(neighbour, neighbour)
                 )
 
                 # There may be multiple edges to a vertex outside of the contraction
                 # TODO: Perhaps don't store in list and have a seperate step later
                 if new_edge_pair not in new_edge_weights:
                     new_edge_weights[new_edge_pair] = []
-                new_edge_weights[new_edge_pair].append(
-                    edge_weights[frozenset((vertex, neighbour))]
-                )
+                new_edge_weights[new_edge_pair].append(edge_weights[old_edge])
 
                 # Delete the edge and edge weight with the neighbout
                 edges[neighbour].remove(vertex)
-                del edge_weights[frozenset((vertex, neighbour))]
+                del edge_weights[old_edge]
             # Handled all neighbours of the vertex,
             # can now delete the edges for this vertex
             del edges[vertex]
 
     # Can safely add the new vertices
-    for contraction in contractions:
-        c = frozenset(contraction)
-        vertices.add(c)
-        if c not in edges:  # Unnecessary if statement, but keeping consistent
-            edges[c] = set()
+    for vertex in processed_contractions:
+        vertices.add(vertex)
+        if vertex not in edges:  # Unnecessary if statement, but keeping consistent
+            edges[vertex] = set()
 
     # Add the new edges to the graph
     for edge, weight in new_edge_weights.items():
@@ -318,20 +335,14 @@ def _contract_proper_cluster_graph(
         else:
             edge_weight = 0
 
-            # Make sure if an edge is not contracted, it behaves as if it were a set
-            # TODO: consider making all vertices a set so consistency doesn't cause issues
-            # This may cause lookup annoyances however so perhaps not.
-            if not isinstance(u, frozenset):
-                u = frozenset((u,))
-            if not isinstance(v, frozenset):
-                v = frozenset((v,))
+            u = set(u)
+            v = set(v)
 
             for tree, tree_weight in zip(trees, weights):
                 for child in tree:
                     # TODO: efficiency here can be improved as we only need to find one element in common
-                    if (
-                        len(u.intersection(child.get_tip_names())) > 0
-                        and len(v.intersection(child.get_tip_names())) > 0
+                    if not u.isdisjoint(child.get_tip_names()) and not v.isdisjoint(
+                        child.get_tip_names()
                     ):
                         # The tree supports the endpoints belonging to a proper cluster
                         edge_weight += tree_weight
@@ -424,7 +435,7 @@ def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
 
 def _proper_cluster_graph_edges(
     pcg_vertices: Set, trees: Sequence[TreeNode], weights: Sequence[float]
-) -> Tuple[Dict, Dict[FrozenSet, float]]:
+) -> Tuple[Dict[Tuple, Set[Tuple]], Dict[Tuple, float], Dict[Tuple, float]]:
     """Constructs a proper cluster graph for a collection of weighted trees.
 
     For a tree, two leaves belong to a proper cluster if the path connecting
@@ -446,9 +457,11 @@ def _proper_cluster_graph_edges(
     """
     edges = {}
     edge_weights = {}
+    max_weights = {}  # Max weight possible for each vertex
 
-    for name in pcg_vertices:
-        edges[name] = set()
+    for vertex in pcg_vertices:
+        edges[vertex] = set()
+        max_weights[vertex] = 0
 
     # total = 0
 
@@ -458,17 +471,30 @@ def _proper_cluster_graph_edges(
             names = side.get_tip_names()
             # start = time.time()
             # print("Len", len(names))
-            for i in range(1, len(names)):
+            for i in range(0, len(names)):
+                ni = (names[i],)
+                max_weights[ni] += weight
                 for j in range(i):
-                    edges[names[i]].add(names[j])
-                    edges[names[j]].add(names[i])
+                    nj = (names[j],)
+                    edges[ni].add(nj)
+                    edges[nj].add(ni)
 
-                    edge = frozenset((names[i], names[j]))
+                    edge = edge_tuple(ni, nj)
                     edge_weights[edge] = edge_weights.get(edge, 0) + weight
             # total += time.time() - start
     # print("CONSTRUCTION PART", total)
     # print(len(trees))
-    return edges, edge_weights
+    return edges, edge_weights, max_weights
+
+
+def edge_tuple(v1, v2):
+    if v1 < v2:
+        return (v1, v2)
+    return (v2, v1)
+
+
+def tuple_sorted(iterable: Iterable):
+    return tuple(sorted(iterable))
 
 
 def _get_all_tip_names(trees: Iterable[TreeNode]) -> Set:

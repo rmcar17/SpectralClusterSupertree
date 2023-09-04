@@ -3,7 +3,7 @@ from typing import List
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode, PhyloNode
 import os
-from tu_spectral_cluster_supertree import spectral_cluster_supertree
+from spectral_cluster_supertree import spectral_cluster_supertree
 
 
 def parse_trees(file_path: str) -> List[PhyloNode]:
