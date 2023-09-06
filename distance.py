@@ -1,3 +1,9 @@
+"""
+The Generalized Robinson-Foulds Distance for Phylogenetic Trees
+
+https://www.liebertpub.com/doi/10.1089/cmb.2021.0342
+"""
+
 from typing import Dict, Tuple
 from cogent3.core.tree import TreeNode
 from cogent3 import make_tree
