@@ -129,6 +129,14 @@ class ClusterTable:
 
         return self.X[self.index][0], self.X[self.index][1]
 
+    def number_of_clusters(self) -> int:
+        length = 0
+        for row in self.X:
+            if row[0] != 0:
+                assert row[1] != 0
+                length += 1
+        return length
+
     def __str__(self) -> str:
         return str(self.X)
 
@@ -141,16 +149,12 @@ def com_clust(psws: List[PSW]) -> ClusterTable:
         X.clear()
         Ti.treset()
         v, w = Ti.nvertex()
-
         while v != -1:
             if w == 0:
-                try:
-                    S.append((X.encode(v), X.encode(v), 1, 1))
-                except IndexError:
-                    pass  # Index error caused by not appearing in other tree
+                S.append((X.encode(v), X.encode(v), 1, 1))
             else:
                 L, R, N, W = float("inf"), 0, 0, 1
-                while w != 0 and len(S) > 0:
+                while w != 0:
                     Ls, Rs, Ns, Ws = S.pop()
                     L, R, N, W = min(L, Ls), max(R, Rs), N + Ns, W + Ws
                     w = w - Ws
@@ -162,10 +166,13 @@ def com_clust(psws: List[PSW]) -> ClusterTable:
     return X
 
 
-def con_tree(psws: List[PSW]) -> PSW:
+def con_tree_psws(psws: List[PSW]) -> PSW:
     X = com_clust(psws)
+    return con_tree_cluster_table(X, psws[0])
+
+
+def con_tree_cluster_table(X: ClusterTable, T1: PSW) -> PSW:
     T = PSW()
-    T1 = psws[0]
     T1.treset()
     v, w = T1.nvertex()
 
@@ -212,12 +219,12 @@ def rename_trees(trees: List[TreeNode]):
 
 
 if __name__ == "__main__":
-    tree1 = make_tree("((a,b),((c,d),e),(f,(g,(h,i))),j,(k,l,m),n);")
-    tree2 = make_tree("(((h,g,k,(a,b),l,f,m),i,j),(e,(c,d)),n);")
+    tree_1 = make_tree("((a,b),((c,d),e),(f,(g,(h,i))),j,(k,l,m),n);")
+    tree_2 = make_tree("(((h,g,k,(a,b),l,f,m),i,j),(e,(c,d)),n);")
 
-    tree1 = make_tree("(((a,b),d),(c,(e,f)));")
-    tree2 = make_tree("((e,f),((a,b),d));")
-    inverse = rename_trees([tree1, tree2])
+    # tree_1 = make_tree("(((a,b),d),(c,f));")
+    # tree_2 = make_tree("((e,f),((a,b),d));")
+    inverse = rename_trees([tree_1, tree_2])
     # count = 0
     # rename = {}
     # for name in tree.get_tip_names():
@@ -228,27 +235,28 @@ if __name__ == "__main__":
 
     # print(tree)
 
-    print(tree1)
-    T1 = make_psw(tree1)
+    print(tree_1)
+    T1 = make_psw(tree_1)
     print(T1)
     X1 = ClusterTable(T1)
     print(X1)
 
     # print()
 
-    print(tree2)
-    T2 = make_psw(tree2)
+    print(tree_2)
+    T2 = make_psw(tree_2)
     print(T2)
     # X2 = ClusterTable(T2)
     # print(X2)
 
     print()
+    print(inverse)
 
     print(com_clust([T1, T2]))
 
     print()
 
-    print(con_tree([T1, T2]))
+    print(con_tree_psws([T1, T2]))
 
     print()
 

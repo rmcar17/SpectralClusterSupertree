@@ -18,19 +18,19 @@ def test_agreeable():
     Tests for when spectral clustering is not required.
     """
 
-    tree1 = make_tree("((a,b),(c,d))")
-    tree2 = make_tree("((a,b),(c,(d,e)))")
+    tree_1 = make_tree("((a,b),(c,d))")
+    tree_2 = make_tree("((a,b),(c,(d,e)))")
 
     expected = make_tree("((a,b),(c,(d,e)))")
 
-    scs_test([tree1, tree2], expected, verbose=True)
+    scs_test([tree_1, tree_2], expected, verbose=True)
 
-    tree1 = make_tree("(((a,b),(c,d)),(z,(x,y)))")
-    tree2 = make_tree("((a,((f,g),b)),(c,(d,e)))")
+    tree_1 = make_tree("(((a,b),(c,d)),(z,(x,y)))")
+    tree_2 = make_tree("((a,((f,g),b)),(c,(d,e)))")
 
     expected = make_tree("(((a,(b,(f,g))),(c,(d,e))),((x,y),z))")
 
-    scs_test([tree1, tree2], expected, verbose=True)
+    scs_test([tree_1, tree_2], expected, verbose=True)
 
 
 if __name__ == "__main__":
