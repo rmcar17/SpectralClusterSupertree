@@ -266,8 +266,8 @@ if __name__ == "__main__":
     # print(compute_delta_vertices(make_tree("((a,b),c)")))
     # print(grf_distance(make_tree("(a,(b,(c,d)))"), make_tree("(a,(b,(c,d)));")))
 
-    n = 5
-    i = 4
+    n = 5  # Number of leaves
+    i = 4  # Point at which edge contracted
     print(grf_distance(make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,(b,(c,d,e)));")))
     print(expected_numerator(n, i))
     print(expected_denominator(n))
