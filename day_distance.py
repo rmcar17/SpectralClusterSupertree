@@ -132,8 +132,8 @@ class ClusterTable:
     def number_of_clusters(self) -> int:
         length = 0
         for row in self.X:
-            if row[0] != 0:
-                assert row[1] != 0
+            if row[0] != 0 and row[0] is not None:
+                assert row[1] != 0 and row[1] is not None
                 length += 1
         return length
 
