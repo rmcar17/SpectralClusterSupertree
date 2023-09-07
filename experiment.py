@@ -3,6 +3,8 @@ import subprocess
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode
 
+from distance import grf_distance
+
 data_path = "data/superfine/"
 model_trees_end = ".model_tree"
 source_trees_end = ".source_trees"
@@ -105,15 +107,16 @@ def report(source_tree_file, model_tree_file, min_cut=False):
 
     if sup_tree is not None:
         # print(sup_tree.lin_rajan_moret(scs_tree))
-        print(model.lin_rajan_moret(sup_tree))
-    print(model.lin_rajan_moret(scs_tree))
+        print(model.lin_rajan_moret(sup_tree), grf_distance(model, sup_tree))
+    print(model.lin_rajan_moret(scs_tree), grf_distance(model, scs_tree))
     if mcs_tree is not None:
-        print(model.lin_rajan_moret(mcs_tree))
+        print(model.lin_rajan_moret(mcs_tree), grf_distance(model, mcs_tree))
 
 
 if __name__ == "__main__":
     # simulated_experiment(100, 20)
-    file = "data/superfine/500-taxa/20/sm_data.5"
+    # file = "data/superfine/500-taxa/20/sm_data.5" # Sup doesn't resolve for 5
+    file = "data/superfine/500-taxa/20/sm_data.0"
     report(file + ".source_trees", file + ".model_tree", True)
     # scs = (
     #     make_tree(
