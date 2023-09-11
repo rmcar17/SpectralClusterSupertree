@@ -2,122 +2,140 @@ import os
 import subprocess
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode
-
-from distance import grf_distance
+import time
+from distance import grf_distance, rf_distance
 
 data_path = "data/superfine/"
 model_trees_end = ".model_tree"
 source_trees_end = ".source_trees"
 
 
-def simulated_experiment(taxa, density):
-    path = data_path + f"{taxa}-taxa/{density}/"
-    data_file_starts = []
-    for file in os.listdir(path):
-        if file.endswith(source_trees_end):
-            data_file_starts.append(".".join(file.split(".")[:-1]))
+# def simulated_experiment(taxa, density):
+#     path = data_path + f"{taxa}-taxa/{density}/"
+#     data_file_starts = []
+#     for file in os.listdir(path):
+#         if file.endswith(source_trees_end):
+#             data_file_starts.append(".".join(file.split(".")[:-1]))
 
-    for data_file_start in data_file_starts:
-        source_tree_file = path + data_file_start + source_trees_end
-        model_tree_file = path + data_file_start + model_trees_end
-        result_sup = subprocess.run(
-            ["./run_superfine.sh", source_tree_file],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+#     for data_file_start in data_file_starts:
+#         source_tree_file = path + data_file_start + source_trees_end
+#         model_tree_file = path + data_file_start + model_trees_end
+#         result_sup = subprocess.run(
+#             ["./run_sup.sh", source_tree_file],
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
 
-        result_scs = subprocess.run(
-            ["./run_scs.sh", source_tree_file],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        # result = subprocess.run(["ls", "-l"], stdout=subprocess.PIPE)
-        # print(result.stdout)
-        # print(result.stderr)
-        sup_tree = (
-            make_tree(result_sup.stdout.decode("utf-8").strip())
-            .bifurcating()
-            .unrooted()
-        )
-        scs_tree = (
-            make_tree(result_scs.stdout.decode("utf-8").strip())
-            .bifurcating()
-            .unrooted()
-        )
-        print("SUPERFINE:", sup_tree)
-        print("SCS:", scs_tree)
+#         result_scs = subprocess.run(
+#             ["./run_scs.sh", source_tree_file],
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
+#         # result = subprocess.run(["ls", "-l"], stdout=subprocess.PIPE)
+#         # print(result.stdout)
+#         # print(result.stderr)
+#         sup_tree = (
+#             make_tree(result_sup.stdout.decode("utf-8").strip())
+#             .bifurcating()
+#             .unrooted()
+#         )
+#         scs_tree = (
+#             make_tree(result_scs.stdout.decode("utf-8").strip())
+#             .bifurcating()
+#             .unrooted()
+#         )
+#         print("SUPERFINE:", sup_tree)
+#         print("SCS:", scs_tree)
 
-        with open(model_tree_file, "r") as f:
-            model = make_tree(f.read().strip()).bifurcating().unrooted()
+#         with open(model_tree_file, "r") as f:
+#             model = make_tree(f.read().strip()).bifurcating().unrooted()
 
-        print(sup_tree.lin_rajan_moret(scs_tree))
-        print(model.lin_rajan_moret(sup_tree))
-        print(model.lin_rajan_moret(scs_tree))
+#         print(sup_tree.lin_rajan_moret(scs_tree))
+#         print(model.lin_rajan_moret(sup_tree))
+#         print(model.lin_rajan_moret(scs_tree))
 
-        break
+#         break
 
 
-def report(source_tree_file, model_tree_file, min_cut=False):
+def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
+    sup_start = time.time()
     result_sup = subprocess.run(
-        ["./run_superfine.sh", source_tree_file],
+        ["./run_sup.sh", source_tree_file],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
+    sup_time = time.time() - sup_start
 
+    scs_start = time.time()
     result_scs = subprocess.run(
         ["./run_scs.sh", source_tree_file],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
+    scs_time = time.time() - scs_start
 
     mcs_tree = None
+    mcs_time = None
     if min_cut:
+        mcs_start = time.time()
         result_mcs = subprocess.run(
             ["./run_mcs.sh", source_tree_file],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
+        mcs_time = time.time() - mcs_start
         mcs_tree = (
-            make_tree(result_mcs.stdout.decode("utf-8").strip())
-            .bifurcating()
-            .unrooted()
+            make_tree(result_mcs.stdout.decode("utf-8").strip()).bifurcating()
+            # .unrooted()
         )
 
     try:
         sup_tree = (
-            make_tree(result_sup.stdout.decode("utf-8").strip())
-            .bifurcating()
-            .unrooted()
+            make_tree(result_sup.stdout.decode("utf-8").strip()).bifurcating()
+            # .unrooted()
         )
     except:
         sup_tree = None
         print(result_sup.stdout.decode("utf-8").strip())
         print(result_sup.stderr.decode("utf-8").strip())
-    scs_tree = (
-        make_tree(result_scs.stdout.decode("utf-8").strip()).bifurcating().unrooted()
-    )
+    scs_tree = make_tree(
+        result_scs.stdout.decode("utf-8").strip()
+    ).bifurcating()  # .unrooted()
 
-    print("SUPERFINE:", sup_tree)
-    print("SCS:", scs_tree)
-    if min_cut:
-        print("MCS:", mcs_tree)
+    if verbose:
+        print("SUPERFINE:", sup_tree)
+        print("SCS:", scs_tree)
+        if min_cut:
+            print("MCS:", mcs_tree)
 
     with open(model_tree_file, "r") as f:
-        model = make_tree(f.read().strip()).bifurcating().unrooted()
+        model = make_tree(f.read().strip()).bifurcating()  # .unrooted()
 
     if sup_tree is not None:
         # print(sup_tree.lin_rajan_moret(scs_tree))
-        print(model.lin_rajan_moret(sup_tree), grf_distance(model, sup_tree))
-    print(model.lin_rajan_moret(scs_tree), grf_distance(model, scs_tree))
-    if mcs_tree is not None:
-        print(model.lin_rajan_moret(mcs_tree), grf_distance(model, mcs_tree))
+        print(
+            f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}"
+        )
+    print(
+        f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}"
+    )
+    if mcs_tree is not None and mcs_time is not None:
+        print(
+            f"MCS: time={mcs_time:.2f} RF={rf_distance(model, mcs_tree)} GRF={grf_distance(model, mcs_tree)}"
+        )
 
 
 if __name__ == "__main__":
     # simulated_experiment(100, 20)
     # file = "data/superfine/500-taxa/20/sm_data.5" # Sup doesn't resolve for 5
-    file = "data/superfine/500-taxa/20/sm_data.0"
-    report(file + ".source_trees", file + ".model_tree", True)
+    # file = "data/superfine/500-taxa/20/sm_data.10"
+    for i in range(10):
+        print(f"Results for {i}:")
+        file = f"birth_death/100_taxa/{i}"
+        report(file + ".source_trees", file + ".model_tree", False)
+
+    # file = f"birth_death/100_taxa/9"
+    # report(file + ".source_trees", file + ".model_tree", False)
     # scs = (
     #     make_tree(
     #         "(((((((((((t70,t46),(t55,(t39,t31),(t63,t86))),(((((t89,t26),t84,t48),((t42,t61,t33),(t99,(t34,t68,t62),t43))),(((t3,t51,t4),(t88,t50)),t75)),t1)),((t54,t81,t67),t96,t58)),(t77,t93)),((((((((t65,t14),t25,t28),(t76,t30,t9),t2),(((t45,t98),(t100,t87,t15),(t18,t95,t22)),((t19,t72),((t71,t79,t41),(t80,t69,t92))))),(t60,t5,t27)),((((t10,t85,t94),(t38,t12,t8)),(t56,t78,t16),t74),(t83,t11),t49)),(t36,(t13,t29),t90)),(t44,t64))),t23),(t91,t59)),(t20,(t21,t52,(t53,t40)),t73,(t17,t47))),t35),t97);"

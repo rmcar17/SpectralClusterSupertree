@@ -17,6 +17,44 @@ from day_distance import (
 )
 
 
+def rf_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
+    tree_1_tips = set(tree_1.get_tip_names())
+    tree_2_tips = set(tree_2.get_tip_names())
+
+    assert tree_1_tips == tree_2_tips
+
+    tree_1 = tree_1.deepcopy()
+    tree_2 = tree_2.deepcopy()
+    inverse = rename_trees([tree_1, tree_2])
+
+    psws = list(map(make_psw, [tree_1, tree_2]))
+
+    cluster_tables = list(map(ClusterTable, psws))
+
+    num_clusters = list(map(lambda x: x.number_of_clusters(), cluster_tables))
+    intersection = 0
+
+    cluster_table = cluster_tables[0]
+    psw = psws[1]
+    S = []
+    psw.treset()
+    v, w = psw.nvertex()
+    while v != -1:
+        if w == 0:
+            S.append((cluster_table.encode(v), cluster_table.encode(v), 1, 1))
+        else:
+            L, R, N, W = float("inf"), 0, 0, 1
+            while w != 0:
+                Ls, Rs, Ns, Ws = S.pop()
+                L, R, N, W = min(L, Ls), max(R, Rs), N + Ns, W + Ws
+                w = w - Ws
+            S.append((L, R, N, W))
+            if N == R - L + 1:
+                intersection += 1
+        v, w = psw.nvertex()
+    return sum(num_clusters) - 2 * intersection
+
+
 def grf_distance(tree_1: TreeNode, tree_2: TreeNode):
     tree_1_tips = set(tree_1.get_tip_names())
     tree_2_tips = set(tree_2.get_tip_names())
@@ -268,10 +306,11 @@ if __name__ == "__main__":
 
     n = 5  # Number of leaves
     i = 4  # Point at which edge contracted
-    print(grf_distance(make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,(b,(c,d,e)));")))
-    print(expected_numerator(n, i))
-    print(expected_denominator(n))
-    print(caterpillar_expected(n, i))
+    # print(grf_distance(make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,(b,(c,d,e)));")))
+    # print(expected_numerator(n, i))
+    # print(expected_denominator(n))
+    # print(caterpillar_expected(n, i))
+    print(rf_distance(make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,((b,e),(c,d)));")))
 
 # T1 Clusters: {a}, {b}, {c}, {d}, {c,d}, {b,c,d}, {a,b,c,d}
 # T2 Clusters: {a}, {b}, {c}, {d}, {c,d}, {a,b,c,d}

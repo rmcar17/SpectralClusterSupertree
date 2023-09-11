@@ -4,7 +4,7 @@ Source:
 https://lukejharmon.github.io/pcm/chapter10_birthdeath/#section-10.2-the-birth-death-model
 """
 
-from typing import Optional
+from typing import List, Optional
 from cogent3.core.tree import PhyloNode
 from cogent3 import make_tree
 import random
@@ -119,6 +119,36 @@ def birth_death_tree(
     return tree
 
 
+def sample_tree(
+    model_tree: PhyloNode, sample_min: int, sample_max: int, times: int
+) -> List[PhyloNode]:
+    unused_names = set(model_tree.get_tip_names())
+    all_names = list(unused_names)
+    source_trees = []
+    while unused_names and times > 0:
+        sample = random.sample(all_names, random.randint(sample_min, sample_max))
+        unused_names.difference_update(sample)
+        source_trees.append(model_tree.get_sub_tree(sample))
+        if not unused_names:
+            times -= 1
+            unused_names = set(model_tree.get_tip_names())
+
+    return source_trees
+
+
+def write_trees(
+    taxa: int, num_trees: int, sample_min: int, sample_max: int, times: int
+):
+    for i in range(num_trees):
+        model_tree = birth_death_tree(1, 0.5, None, taxa, True, True)
+        source_trees = sample_tree(model_tree, sample_min, sample_max, times)
+        with open(f"birth_death/100_taxa/{i}.model_tree", "w") as f:
+            f.write(str(model_tree))
+        with open(f"birth_death/100_taxa/{i}.source_trees", "w") as f:
+            f.write("\n".join(map(str, source_trees)))
+
+
 if __name__ == "__main__":
-    tree = birth_death_tree(1.8, 0.2, None, 10000, True, True)
-    print(tree.ascii_art())
+    # tree = birth_death_tree(1.8, 0.2, None, 1000, True, True)
+    # print(tree.ascii_art())
+    write_trees(100, 10, 5, 20, 5)
