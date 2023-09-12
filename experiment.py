@@ -3,7 +3,7 @@ import subprocess
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode
 import time
-from distance import grf_distance, rf_distance
+from distance import grf_distance, grf_distance_slow, rf_distance
 
 data_path = "data/superfine/"
 model_trees_end = ".model_tree"
@@ -114,14 +114,14 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
     if sup_tree is not None:
         # print(sup_tree.lin_rajan_moret(scs_tree))
         print(
-            f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}"
+            f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}, {grf_distance_slow(model, sup_tree)}"
         )
     print(
-        f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}"
+        f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}, {grf_distance_slow(model, scs_tree)}"
     )
     if mcs_tree is not None and mcs_time is not None:
         print(
-            f"MCS: time={mcs_time:.2f} RF={rf_distance(model, mcs_tree)} GRF={grf_distance(model, mcs_tree)}"
+            f"MCS: time={mcs_time:.2f} RF={rf_distance(model, mcs_tree)} GRF={grf_distance(model, mcs_tree)}, {grf_distance_slow(model, mcs_tree)}"
         )
 
 

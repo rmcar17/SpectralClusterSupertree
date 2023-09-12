@@ -4,7 +4,8 @@ The Generalized Robinson-Foulds Distance for Phylogenetic Trees
 https://www.liebertpub.com/doi/10.1089/cmb.2021.0342
 """
 
-from typing import Dict, Tuple
+import time
+from typing import Any, Dict, FrozenSet, Set, Tuple
 from cogent3.core.tree import TreeNode
 from cogent3 import make_tree
 
@@ -49,13 +50,50 @@ def rf_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
                 L, R, N, W = min(L, Ls), max(R, Rs), N + Ns, W + Ws
                 w = w - Ws
             S.append((L, R, N, W))
-            if N == R - L + 1:
+            if N == R - L + 1 and cluster_table.is_clust(L, R):
                 intersection += 1
         v, w = psw.nvertex()
     return sum(num_clusters) - 2 * intersection
 
 
-def grf_distance(tree_1: TreeNode, tree_2: TreeNode):
+def get_clusters_slow(tree: TreeNode) -> Set[FrozenSet[Any]]:
+    clusters = set()
+    for node in tree.postorder(include_self=True):
+        clusters.add(frozenset(node.get_tip_names()))
+    return clusters
+
+
+def grf_distance_slow(tree_1: TreeNode, tree_2: TreeNode) -> float:
+    start = time.time()
+    tree_1_clusters = get_clusters_slow(tree_1)
+    tree_2_clusters = get_clusters_slow(tree_2)
+
+    union_cardinality = len(tree_1_clusters.union(tree_2_clusters))
+
+    numerator_1 = 0
+    for x in tree_1_clusters:
+        for y in tree_2_clusters.difference(tree_1_clusters):
+            numerator_1 += len(x.symmetric_difference(y))
+
+    numerator_2 = 0
+    for x in tree_1_clusters.difference(tree_2_clusters):
+        for y in tree_2_clusters:
+            numerator_2 += len(x.symmetric_difference(y))
+
+    denominator_1 = union_cardinality * len(tree_1_clusters)
+    denominator_2 = union_cardinality * len(tree_2_clusters)
+
+    print("SLOW")
+    print(numerator_1, denominator_1)
+    print(numerator_2, denominator_2)
+    print("TIME", time.time() - start)
+    # print(sorted(map(lambda x: sorted(tuple(x)), tree_1_clusters)))
+    # print(sorted(map(lambda x: sorted(tuple(x)), tree_2_clusters)))
+    return numerator_1 / denominator_1 + numerator_2 / denominator_2
+
+
+def grf_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
+    start = time.time()
     tree_1_tips = set(tree_1.get_tip_names())
     tree_2_tips = set(tree_2.get_tip_names())
 
@@ -125,6 +163,11 @@ def grf_distance(tree_1: TreeNode, tree_2: TreeNode):
     # print("UN", union_of_cluster_cardinality)
     # print("C1", cluster_1_cardinality)
     # print("C2", cluster_2_cardinality)
+    print("FAST")
+    print(numerator_1, denominator_1)
+    print(numerator_2, denominator_2)
+    print("TIME", time.time() - start)
+    # print(cluster_1_cardinality, cluster_2_cardinality, union_of_cluster_cardinality)
     return numerator_1 / denominator_1 + numerator_2 / denominator_2
 
 
@@ -207,12 +250,15 @@ def compute_cluster_related(tree_1: TreeNode, tree_2: TreeNode):
 
     union_of_clusters_cardinality = number_of_clusters[0]
 
+    # print("NUMBER OF CLUS", number_of_clusters, tree_1, tree_2)
     cluster_table_1 = cluster_tables[0]
     psw_2 = psws[1]
     psw_2.treset()
     v, w = psw_2.nvertex()
     S = []
+    # print(psw_2)
     while v != -1:
+        # print("V", v, "W", w, S)
         if w == 0:
             S.append((cluster_table_1.encode(v), cluster_table_1.encode(v), 1, 1))
         else:
@@ -222,9 +268,13 @@ def compute_cluster_related(tree_1: TreeNode, tree_2: TreeNode):
                 L, R, N, W = min(L, Ls), max(R, Rs), N + Ns, W + Ws
                 w = w - Ws
             S.append((L, R, N, W))
-            if N == R - L + 1:  # Then we have found an identical cluster
+            if N == R - L + 1 and cluster_table_1.is_clust(
+                L, R
+            ):  # Then we have found an identical cluster
                 pass
+                # print("FOUND CLUSTER", L, R)
             else:
+                # print("FOUND DIFFERENT CLUSTER", L, R)
                 union_of_clusters_cardinality += 1
 
         v, w = psw_2.nvertex()
@@ -310,7 +360,12 @@ if __name__ == "__main__":
     # print(expected_numerator(n, i))
     # print(expected_denominator(n))
     # print(caterpillar_expected(n, i))
-    print(rf_distance(make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,((b,e),(c,d)));")))
+    print(
+        grf_distance(make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,((b,e),(c,d)));")),
+        grf_distance_slow(
+            make_tree("(a,(b,(c,(d,e))));"), make_tree("(a,((b,e),(c,d)));")
+        ),
+    )
 
 # T1 Clusters: {a}, {b}, {c}, {d}, {c,d}, {b,c,d}, {a,b,c,d}
 # T2 Clusters: {a}, {b}, {c}, {d}, {c,d}, {a,b,c,d}
