@@ -64,7 +64,7 @@ def get_clusters_slow(tree: TreeNode) -> Set[FrozenSet[Any]]:
 
 
 def grf_distance_slow(tree_1: TreeNode, tree_2: TreeNode) -> float:
-    start = time.time()
+    # start = time.time()
     tree_1_clusters = get_clusters_slow(tree_1)
     tree_2_clusters = get_clusters_slow(tree_2)
 
@@ -83,17 +83,17 @@ def grf_distance_slow(tree_1: TreeNode, tree_2: TreeNode) -> float:
     denominator_1 = union_cardinality * len(tree_1_clusters)
     denominator_2 = union_cardinality * len(tree_2_clusters)
 
-    print("SLOW")
-    print(numerator_1, denominator_1)
-    print(numerator_2, denominator_2)
-    print("TIME", time.time() - start)
+    # print("SLOW")
+    # print(numerator_1, denominator_1)
+    # print(numerator_2, denominator_2)
+    # print("TIME", time.time() - start)
     # print(sorted(map(lambda x: sorted(tuple(x)), tree_1_clusters)))
     # print(sorted(map(lambda x: sorted(tuple(x)), tree_2_clusters)))
     return numerator_1 / denominator_1 + numerator_2 / denominator_2
 
 
 def grf_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
-    start = time.time()
+    # start = time.time()
     tree_1_tips = set(tree_1.get_tip_names())
     tree_2_tips = set(tree_2.get_tip_names())
 
@@ -163,10 +163,10 @@ def grf_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
     # print("UN", union_of_cluster_cardinality)
     # print("C1", cluster_1_cardinality)
     # print("C2", cluster_2_cardinality)
-    print("FAST")
-    print(numerator_1, denominator_1)
-    print(numerator_2, denominator_2)
-    print("TIME", time.time() - start)
+    # print("FAST")
+    # print(numerator_1, denominator_1)
+    # print(numerator_2, denominator_2)
+    # print("TIME", time.time() - start)
     # print(cluster_1_cardinality, cluster_2_cardinality, union_of_cluster_cardinality)
     return numerator_1 / denominator_1 + numerator_2 / denominator_2
 
