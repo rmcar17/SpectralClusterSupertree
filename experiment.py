@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # file = "data/superfine/500-taxa/20/sm_data.10"
     for i in range(10):
         print(f"Results for {i}:")
-        file = f"birth_death/100_taxa/{i}"
+        file = f"birth_death/200_taxa/{i}"
         report(file + ".source_trees", file + ".model_tree", False)
 
     # file = f"birth_death/100_taxa/9"

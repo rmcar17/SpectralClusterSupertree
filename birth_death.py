@@ -9,6 +9,8 @@ from cogent3.core.tree import PhyloNode
 from cogent3 import make_tree
 import random
 
+from tree_operations import num_rooted_nni_operations, rooted_nni
+
 
 def birth_death_tree(
     birth_rate: float,
@@ -120,15 +122,26 @@ def birth_death_tree(
 
 
 def sample_tree(
-    model_tree: PhyloNode, sample_min: int, sample_max: int, times: int
+    model_tree: PhyloNode, sample_min: int, sample_max: int, times: int, nni_steps: int
 ) -> List[PhyloNode]:
     unused_names = set(model_tree.get_tip_names())
     all_names = list(unused_names)
     source_trees = []
     while unused_names and times > 0:
-        sample = random.sample(all_names, random.randint(sample_min, sample_max))
+        sub_tree_size = random.randint(sample_min, sample_max)
+        sample = random.sample(all_names, sub_tree_size)
+
         unused_names.difference_update(sample)
-        source_trees.append(model_tree.get_sub_tree(sample))
+
+        sub_tree = model_tree.get_sub_tree(sample)
+
+        possible_nni_operations = num_rooted_nni_operations(sub_tree_size)
+        for _ in range(nni_steps):
+            rooted_nni(
+                sub_tree, random.randrange(0, possible_nni_operations), copy=False
+            )
+
+        source_trees.append(sub_tree)
         if not unused_names:
             times -= 1
             unused_names = set(model_tree.get_tip_names())
@@ -137,18 +150,24 @@ def sample_tree(
 
 
 def write_trees(
-    taxa: int, num_trees: int, sample_min: int, sample_max: int, times: int
+    taxa: int,
+    num_trees: int,
+    sample_min: int,
+    sample_max: int,
+    times: int,
+    nni_steps: int = 0,
 ):
     for i in range(num_trees):
         model_tree = birth_death_tree(1, 0.5, None, taxa, True, True)
-        source_trees = sample_tree(model_tree, sample_min, sample_max, times)
-        with open(f"birth_death/100_taxa/{i}.model_tree", "w") as f:
+        source_trees = sample_tree(model_tree, sample_min, sample_max, times, nni_steps)
+        with open(f"birth_death/{taxa}_taxa/{i}.model_tree", "w") as f:
             f.write(str(model_tree))
-        with open(f"birth_death/100_taxa/{i}.source_trees", "w") as f:
+        with open(f"birth_death/{taxa}_taxa/{i}.source_trees", "w") as f:
             f.write("\n".join(map(str, source_trees)))
 
 
 if __name__ == "__main__":
     # tree = birth_death_tree(1.8, 0.2, None, 1000, True, True)
     # print(tree.ascii_art())
-    write_trees(100, 10, 5, 20, 5)
+    # write_trees(100, 10, 5, 20, 5)
+    write_trees(200, 10, 20, 50, 10, 3)
