@@ -170,4 +170,5 @@ if __name__ == "__main__":
     # tree = birth_death_tree(1.8, 0.2, None, 1000, True, True)
     # print(tree.ascii_art())
     # write_trees(100, 10, 5, 20, 5)
-    write_trees(200, 10, 20, 50, 10, 3)
+    # write_trees(1000, 10, 200, 400, 2, 5)
+    write_trees(1500, 10, 300, 500, 3, 10)

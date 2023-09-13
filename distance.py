@@ -8,7 +8,7 @@ import time
 from typing import Any, Dict, FrozenSet, Set, Tuple
 from cogent3.core.tree import TreeNode
 from cogent3 import make_tree
-
+import networkx as nx
 from day_distance import (
     ClusterTable,
     com_clust,
@@ -61,6 +61,34 @@ def get_clusters_slow(tree: TreeNode) -> Set[FrozenSet[Any]]:
     for node in tree.postorder(include_self=True):
         clusters.add(frozenset(node.get_tip_names()))
     return clusters
+
+
+def cluster_matching_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
+    clusters_1 = get_clusters_slow(tree_1)
+    clusters_2 = get_clusters_slow(tree_2)
+
+    difference_1 = clusters_1.difference(clusters_2)
+    difference_2 = clusters_2.difference(clusters_1)
+
+    assert len(difference_1) == len(difference_2)
+
+    graph = nx.Graph()
+
+    graph.add_nodes_from(difference_1)
+    graph.add_nodes_from(difference_2)
+
+    for node_1 in difference_1:
+        for node_2 in difference_2:
+            graph.add_edge(
+                node_1, node_2, weight=len(node_1.symmetric_difference(node_2))
+            )
+
+    distance = 0
+    matching_edges = nx.min_weight_matching(graph)
+    for edge in matching_edges:
+        distance += graph.edges[edge]["weight"]
+
+    return distance
 
 
 def grf_distance_slow(tree_1: TreeNode, tree_2: TreeNode) -> float:
