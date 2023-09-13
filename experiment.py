@@ -3,7 +3,12 @@ import subprocess
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode
 import time
-from distance import grf_distance, grf_distance_slow, rf_distance
+from distance import (
+    cluster_matching_distance,
+    grf_distance,
+    grf_distance_slow,
+    rf_distance,
+)
 
 data_path = "data/superfine/"
 model_trees_end = ".model_tree"
@@ -114,14 +119,14 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
     if sup_tree is not None:
         # print(sup_tree.lin_rajan_moret(scs_tree))
         print(
-            f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}, {grf_distance_slow(model, sup_tree)}"
+            f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}, {grf_distance_slow(model, sup_tree)}, MAT={cluster_matching_distance(model, sup_tree)}"
         )
     print(
-        f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}, {grf_distance_slow(model, scs_tree)}"
+        f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}, {grf_distance_slow(model, scs_tree)}, MAT={cluster_matching_distance(model, scs_tree)}"
     )
     if mcs_tree is not None and mcs_time is not None:
         print(
-            f"MCS: time={mcs_time:.2f} RF={rf_distance(model, mcs_tree)} GRF={grf_distance(model, mcs_tree)}, {grf_distance_slow(model, mcs_tree)}"
+            f"MCS: time={mcs_time:.2f} RF={rf_distance(model, mcs_tree)} GRF={grf_distance(model, mcs_tree)}, {grf_distance_slow(model, mcs_tree)}, MAT={cluster_matching_distance(model, mcs_tree)}"
         )
 
 
@@ -129,9 +134,10 @@ if __name__ == "__main__":
     # simulated_experiment(100, 20)
     # file = "data/superfine/500-taxa/20/sm_data.5" # Sup doesn't resolve for 5
     # file = "data/superfine/500-taxa/20/sm_data.10"
-    for i in range(10):
+    for i in range(10):  # range(10):
         print(f"Results for {i}:")
-        file = f"birth_death/200_taxa/{i}"
+        file = f"birth_death/1500_taxa/{i}"
+        # file = f"data/superfine/500-taxa/100/sm_data.{i}"
         report(file + ".source_trees", file + ".model_tree", False)
 
     # file = f"birth_death/100_taxa/9"
