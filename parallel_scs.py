@@ -27,7 +27,7 @@ def parallel_sum_sequence_split(
     return MergeResultOfTasks(
         [
             Task(parallel_sum_sequence_split, (sequence[:midpoint],)),
-            Task(parallel_sum_sequence_split, (sequence[:midpoint],)),
+            Task(parallel_sum_sequence_split, (sequence[midpoint:],)),
         ],
         parallel_sum_sequence_add,
     )
@@ -47,11 +47,28 @@ def parallel_spectral_cluster_supertree(
 
     print("INIT DIST")
     distributor = TaskDistributor(num_workers)
-    distributor.add_task(Task(func, (3, 4)))
-    print(distributor.run())
+    # distributor.add_task(Task(func, (3, 4)))
+    distributor.initialise_workers()
+    n = 10000
+    seq = list(range(n + 1))
+    distributor.add_task(Task(parallel_sum_sequence_split, (seq,)))
+    import time
+
+    start = time.time()
+    print(distributor.run(), time.time() - start)
+    start = time.time()
+    print(my_sum(seq), time.time() - start)
+    print((n * (n + 1)) // 2)
+
+
+def my_sum(seq):
+    total = 0
+    for s in seq:
+        total += s
+    return total
 
 
 if __name__ == "__main__":
     parallel_spectral_cluster_supertree(
-        [make_tree("(a,(b,c))"), make_tree("(b,(a,d))")], num_workers=1
+        [make_tree("(a,(b,c))"), make_tree("(b,(a,d))")], num_workers=11
     )
