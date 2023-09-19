@@ -134,17 +134,19 @@ if __name__ == "__main__":
     # simulated_experiment(100, 20)
     # file = "data/superfine/500-taxa/20/sm_data.5" # Sup doesn't resolve for 5
     # file = "data/superfine/500-taxa/20/sm_data.10"
-    # for i in range(10):  # range(10):
-    #     print(f"Results for {i}:")
-    #     file = f"birth_death/1500_taxa/{i}"
-    #     # file = f"data/superfine/500-taxa/100/sm_data.{i}"
-    #     report(file + ".source_trees", file + ".model_tree", False)
 
+    # report(file + ".source_trees", file + ".model_tree", False)
     for i in range(10):  # range(10):
         print(f"Results for {i}:")
-        file = f"simulated_trees/simulated_tree_data/100_taxa/{i}"
+        file = f"birth_death/400_taxa/{i}"
         # file = f"data/superfine/500-taxa/100/sm_data.{i}"
         report(file + ".source_trees", file + ".model_tree", False)
+
+    # for i in range(10):  # range(10):
+    #     print(f"Results for {i}:")
+    #     file = f"simulated_trees/simulated_tree_data/100_taxa/{i}"
+    #     # file = f"data/superfine/500-taxa/100/sm_data.{i}"
+    #     report(file + ".source_trees", file + ".model_tree", False)
 
     # file = f"birth_death/100_taxa/9"
     # report(file + ".source_trees", file + ".model_tree", False)

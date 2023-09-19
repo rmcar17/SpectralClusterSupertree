@@ -1,4 +1,5 @@
-from cogent3.core.tree import TreeNode
+from typing import List
+from cogent3.core.tree import TreeNode, PhyloNode
 from cogent3 import make_tree
 
 
@@ -63,6 +64,30 @@ def rooted_nni(tree: TreeNode, nni_id: int, copy: bool = True) -> TreeNode:
     return tree
 
 
+def weight_nni_operations(tree: PhyloNode) -> List[float]:
+    weights = []
+
+    for node in tree.postorder():
+        if node.is_tip() or node.is_root():
+            continue
+        assert len(node.children) == 2 and node.parent is not None
+        parent: TreeNode = node.parent
+        assert len(parent.children) == 2
+        sibling_index = 0 if parent.children[0] is not node else 1
+        assert parent.children[1 - sibling_index] is node, (
+            str(node) + " " + str(parent.children[1 - sibling_index])
+        )
+        for child_index in range(2):
+            weight = 1 / (
+                node.length
+                + parent.children[sibling_index].length
+                + node.children[child_index].length
+            )
+            weights.append(weight)
+
+    return weights
+
+
 def num_rooted_nni_operations(tree_size: int) -> int:
     """
     Given the size (number of leaves) of a rooted binary tree,
@@ -80,7 +105,27 @@ def num_rooted_nni_operations(tree_size: int) -> int:
 if __name__ == "__main__":
     # tree = make_tree("((a,b),(c,(d,e)));")
     # print(tree, "->", rooted_nni(tree, 5))
-    tree = make_tree("((t194,t002),((t095,t117),((t190,t175),(t064,t184))));")
-    for i in range(num_rooted_nni_operations(len(tree.get_tip_names()))):
-        print("DOING", i)
-        print(rooted_nni(tree, i, False))
+    # tree = make_tree("((t194,t002),((t095,t117),((t190,t175),(t064,t184))));")
+    # for i in range(num_rooted_nni_operations(len(tree.get_tip_names()))):
+    #     print("DOING", i)
+    #     print(rooted_nni(tree, i, False))
+    # tree = make_tree(
+    #     "((t1:0.013280800038026752,t2:0.013280800038026752):0.5809975939523674,t0:0.5942783939903942);"
+    # )
+    tree = make_tree(
+        "(t0:0.845001141002774,(t1:0.5649646559618651,(t2:0.03334772953977818,t3:0.03334772953977818):0.5316169264220869):0.28003648504090894);"
+    )
+    print(tree.length)
+    print(tree[1].length)
+    import random
+
+    weights = weight_nni_operations(tree)
+    dist = [0, 0, 0, 0]
+    for i in range(100000):
+        choice = random.choices(range(len(weights)), weights=weights)[0]
+        dist[choice] += 1
+    expected = weights.copy()
+    for i in range(len(expected)):
+        expected[i] = 100000 * expected[i] / sum(weights)
+    # print(weights, random.choices(list(range(len(weights))), weights=weights))
+    print(dist, expected)

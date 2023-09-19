@@ -9,7 +9,7 @@ from cogent3.core.tree import PhyloNode
 from cogent3 import make_tree
 import random
 
-from tree_operations import num_rooted_nni_operations, rooted_nni
+from tree_operations import num_rooted_nni_operations, rooted_nni, weight_nni_operations
 
 
 def birth_death_tree(
@@ -135,10 +135,16 @@ def sample_tree(
 
         sub_tree = model_tree.get_sub_tree(sample)
 
+        assert isinstance(sub_tree, PhyloNode)
+
         possible_nni_operations = num_rooted_nni_operations(sub_tree_size)
         for _ in range(nni_steps):
+            weights = weight_nni_operations(sub_tree)
+            assert len(weights) == possible_nni_operations
             rooted_nni(
-                sub_tree, random.randrange(0, possible_nni_operations), copy=False
+                sub_tree,
+                random.choices(range(possible_nni_operations), weights=weights)[0],
+                copy=False,
             )
 
         source_trees.append(sub_tree)
@@ -149,17 +155,79 @@ def sample_tree(
     return source_trees
 
 
+def clade_sample_tree(
+    model_tree: PhyloNode,
+    sample_min: int,
+    sample_max: int,
+    min_occurrences: int,
+    nni_steps: int,
+) -> List[PhyloNode]:
+    assert min_occurrences > 0
+    assert sample_min >= 3
+    all_names = list(model_tree.get_tip_names())
+    assert sample_max <= len(all_names)
+    occurences_left = {}
+    for name in all_names:
+        occurences_left[name] = min_occurrences
+
+    valid_internal_nodes = list(model_tree.postorder())
+    valid_internal_nodes = list(
+        filter(
+            lambda x: not x.is_tip() and len(x.get_tip_names()) >= sample_min,
+            valid_internal_nodes,
+        )
+    )
+
+    source_trees = []
+    while occurences_left:
+        sub_tree_size = random.randint(sample_min, sample_max)
+
+        internal_node = random.choice(valid_internal_nodes)
+        internal_tips = internal_node.get_tip_names()
+        while len(internal_tips) < sub_tree_size:
+            internal_node = random.choice(valid_internal_nodes)
+            internal_tips = internal_node.get_tip_names()
+
+        sample = random.sample(internal_tips, sub_tree_size)
+
+        for taxa in sample:
+            if taxa in occurences_left:
+                occurences_left[taxa] -= 1
+                if occurences_left[taxa] <= 0:
+                    del occurences_left[taxa]
+
+        sub_tree = model_tree.get_sub_tree(sample)
+
+        assert isinstance(sub_tree, PhyloNode)
+
+        possible_nni_operations = num_rooted_nni_operations(sub_tree_size)
+        for _ in range(nni_steps):
+            weights = weight_nni_operations(sub_tree)
+            assert len(weights) == possible_nni_operations
+            rooted_nni(
+                sub_tree,
+                random.choices(range(possible_nni_operations), weights=weights)[0],
+                copy=False,
+            )
+
+        source_trees.append(sub_tree)
+
+    return source_trees
+
+
 def write_trees(
     taxa: int,
     num_trees: int,
     sample_min: int,
     sample_max: int,
-    times: int,
+    min_occurrences: int,
     nni_steps: int = 0,
 ):
     for i in range(num_trees):
         model_tree = birth_death_tree(1, 0.5, None, taxa, True, True)
-        source_trees = sample_tree(model_tree, sample_min, sample_max, times, nni_steps)
+        source_trees = clade_sample_tree(
+            model_tree, sample_min, sample_max, min_occurrences, nni_steps
+        )
         with open(f"birth_death/{taxa}_taxa/{i}.model_tree", "w") as f:
             f.write(str(model_tree))
         with open(f"birth_death/{taxa}_taxa/{i}.source_trees", "w") as f:
@@ -171,4 +239,7 @@ if __name__ == "__main__":
     # print(tree.ascii_art())
     # write_trees(100, 10, 5, 20, 5)
     # write_trees(1000, 10, 200, 400, 2, 5)
-    write_trees(1500, 10, 300, 500, 3, 10)
+    # write_trees(1500, 10, 300, 500, 3, 10)
+    # write_trees(300, 10, 50, 150, 3, 7)
+    # write_trees(150, 10, 20, 50, 3, 7)
+    write_trees(400, 10, 30, 80, 3, 7)
