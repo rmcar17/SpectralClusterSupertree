@@ -367,6 +367,9 @@ def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
     return tree_builder(None, trees)
 
 
+KEEP_DIRECTION = True
+
+
 def _generate_induced_trees_with_weights(
     names: Set, trees: Sequence[TreeNode], weights: Sequence[float]
 ) -> Tuple[List[TreeNode], List[float]]:
@@ -396,7 +399,11 @@ def _generate_induced_trees_with_weights(
         # there is no point inducing (no proper clusters)
         if len(names.intersection(tree.get_tip_names())) < 2:
             continue
-        induced_trees.append(tree.get_sub_tree(names, ignore_missing=True))
+        if KEEP_DIRECTION:
+            induced_trees.append(tree._get_sub_tree(names))
+            induced_trees[-1].name = "root"
+        else:
+            induced_trees.append(tree.get_sub_tree(names, ignore_missing=True))
         new_weights.append(weight)
 
     return induced_trees, new_weights

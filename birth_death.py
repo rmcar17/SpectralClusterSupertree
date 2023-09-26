@@ -242,4 +242,5 @@ if __name__ == "__main__":
     # write_trees(1500, 10, 300, 500, 3, 10)
     # write_trees(300, 10, 50, 150, 3, 7)
     # write_trees(150, 10, 20, 50, 3, 7)
-    write_trees(400, 10, 30, 80, 3, 7)
+    # write_trees(400, 10, 30, 80, 3, 7)
+    write_trees(800, 10, 150, 300, 3, 7)
