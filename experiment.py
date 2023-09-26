@@ -79,6 +79,16 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
     )
     scs_time = time.time() - scs_start
 
+    bcd_start = time.time()
+    result_bcd = subprocess.run(
+        ["./run_bcd.sh", source_tree_file],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    # print(result_bcd.stderr)
+    # print(result_bcd.stdout)
+    bcd_time = time.time() - bcd_start
+
     mcs_tree = None
     mcs_time = None
     if min_cut:
@@ -103,13 +113,17 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
         sup_tree = None
         print(result_sup.stdout.decode("utf-8").strip())
         print(result_sup.stderr.decode("utf-8").strip())
+
     scs_tree = make_tree(
         result_scs.stdout.decode("utf-8").strip()
     ).bifurcating()  # .unrooted()
 
+    bcd_tree = make_tree(result_bcd.stdout.decode("utf-8").strip())
+
     if verbose:
         print("SUPERFINE:", sup_tree)
         print("SCS:", scs_tree)
+        print("BCD", bcd_tree)
         if min_cut:
             print("MCS:", mcs_tree)
 
@@ -124,6 +138,12 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
     print(
         f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}, {grf_distance_slow(model, scs_tree)}, MAT={cluster_matching_distance(model, scs_tree)}"
     )
+    try:
+        print(
+            f"BCD: time={bcd_time:.2f} RF={rf_distance(model, bcd_tree)} GRF={grf_distance(model, bcd_tree)}, {grf_distance_slow(model, bcd_tree)}, MAT={cluster_matching_distance(model, bcd_tree)}"
+        )
+    except AssertionError:
+        print("BCD generated tree with missing tips")
     if mcs_tree is not None and mcs_time is not None:
         print(
             f"MCS: time={mcs_time:.2f} RF={rf_distance(model, mcs_tree)} GRF={grf_distance(model, mcs_tree)}, {grf_distance_slow(model, mcs_tree)}, MAT={cluster_matching_distance(model, mcs_tree)}"
@@ -141,6 +161,15 @@ if __name__ == "__main__":
         file = f"birth_death/400_taxa/{i}"
         # file = f"data/superfine/500-taxa/100/sm_data.{i}"
         report(file + ".source_trees", file + ".model_tree", False)
+
+    # taxa=500, density =20 generating results with non-matching tips? data/superfine/500-taxa/20/sm_data.2
+
+    # taxa = 100
+    # density = 20
+    # for i in range(30):
+    #     file = f"data/superfine/{taxa}-taxa/{density}/sm_data.{i}"
+    #     print("DOING", file)
+    #     report(file + ".source_trees", file + ".model_tree", False)
 
     # for i in range(10):  # range(10):
     #     print(f"Results for {i}:")

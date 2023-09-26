@@ -22,7 +22,11 @@ def rf_distance(tree_1: TreeNode, tree_2: TreeNode) -> float:
     tree_1_tips = set(tree_1.get_tip_names())
     tree_2_tips = set(tree_2.get_tip_names())
 
-    assert tree_1_tips == tree_2_tips
+    assert tree_1_tips == tree_2_tips, (
+        str(tree_1_tips.difference(tree_2_tips))
+        + " "
+        + str(tree_2_tips.difference(tree_1_tips))
+    )
 
     tree_1 = tree_1.deepcopy()
     tree_2 = tree_2.deepcopy()
