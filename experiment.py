@@ -156,13 +156,15 @@ if __name__ == "__main__":
     # file = "data/superfine/500-taxa/20/sm_data.10"
 
     # report(file + ".source_trees", file + ".model_tree", False)
-    for i in range(10):  # range(10):
-        print(f"Results for {i}:")
-        file = f"birth_death/400_taxa/{i}"
-        # file = f"data/superfine/500-taxa/100/sm_data.{i}"
-        report(file + ".source_trees", file + ".model_tree", False)
+    # for i in range(10):  # range(10):
+    #     print(f"Results for {i}:")
+    #     file = f"birth_death/400_taxa/{i}"
+    #     # file = f"data/superfine/500-taxa/100/sm_data.{i}"
+    #     report(file + ".source_trees", file + ".model_tree", False)
 
     # taxa=500, density =20 generating results with non-matching tips? data/superfine/500-taxa/20/sm_data.2
+    file = "data/superfine/500-taxa/20/sm_data.2"
+    report(file + ".source_trees", file + ".model_tree", False)
 
     # taxa = 100
     # density = 20

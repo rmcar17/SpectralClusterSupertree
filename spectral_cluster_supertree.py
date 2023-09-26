@@ -143,7 +143,7 @@ def spectral_cluster_supertree(
         missing_tips = component.difference(_get_all_tip_names(new_induced_trees))
 
         # In this case, treat these tips as individual subtrees
-        child_trees.extend(map(_tip_names_to_tree, missing_tips))
+        child_trees.extend(map(lambda x: _tip_names_to_tree((x,)), missing_tips))
 
     # Connect the child trees by making adjacent to a new root.
     supertree = _connect_trees(child_trees)
