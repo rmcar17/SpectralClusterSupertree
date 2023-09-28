@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import List, Optional, Tuple
 from cogent3 import make_tree
 from cogent3.core.tree import TreeNode
 import time
@@ -61,15 +62,59 @@ source_trees_end = ".source_trees"
 
 #         break
 
+SUP = "SUP"
+SCS = "SCS"
+MCS = "MCS"
+BCD = "BCD"
+
+SCRIPTS = {
+    SUP: "./run_sup.sh",
+    SCS: "./run_scs.sh",
+    MCS: "./run_mcs.sh",
+    BCD: "./run_bcd.sh",
+}
+
+
+def run_methods(source_tree_file: str, model_tree_file: str, methods: List[str]):
+    results = {}
+    for method in methods:
+        start_time = time.time()
+        result = subprocess.run(
+            [SCRIPTS[method], source_tree_file],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        end_time = time.time()
+        try:
+            tree = make_tree(result.stdout.decode("utf-8").strip()).bifurcating()
+        except:
+            tree = None
+        results[method] = (tree, end_time - start_time)
+
+    with open(model_tree_file, "r") as f:
+        model = make_tree(f.read().strip()).bifurcating()
+
+    for method in methods:
+        tree, time_result = results[method]
+        if tree is None:
+            print(f"{method}: time={time_result:.2f}s failed: {source_tree_file}) ")
+        else:
+            rf = rf_distance(model, tree)
+            grf = grf_distance(model, tree)
+            mat = cluster_matching_distance(model, tree)
+            print(f"{method}: time={time_result:.2f}s RF={rf} MAT={mat} GRF={grf}")
+
+    return results
+
 
 def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
-    sup_start = time.time()
-    result_sup = subprocess.run(
-        ["./run_sup.sh", source_tree_file],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    sup_time = time.time() - sup_start
+    # sup_start = time.time()
+    # result_sup = subprocess.run(
+    #     ["./run_sup.sh", source_tree_file],
+    #     stdout=subprocess.PIPE,
+    #     stderr=subprocess.PIPE,
+    # )
+    # sup_time = time.time() - sup_start
 
     scs_start = time.time()
     result_scs = subprocess.run(
@@ -104,15 +149,15 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
             # .unrooted()
         )
 
-    try:
-        sup_tree = (
-            make_tree(result_sup.stdout.decode("utf-8").strip()).bifurcating()
-            # .unrooted()
-        )
-    except:
-        sup_tree = None
-        print(result_sup.stdout.decode("utf-8").strip())
-        print(result_sup.stderr.decode("utf-8").strip())
+    # try:
+    #     sup_tree = (
+    #         make_tree(result_sup.stdout.decode("utf-8").strip()).bifurcating()
+    #         # .unrooted()
+    #     )
+    # except:
+    #     sup_tree = None
+    #     print(result_sup.stdout.decode("utf-8").strip())
+    #     print(result_sup.stderr.decode("utf-8").strip())
 
     scs_tree = make_tree(
         result_scs.stdout.decode("utf-8").strip()
@@ -121,7 +166,7 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
     bcd_tree = make_tree(result_bcd.stdout.decode("utf-8").strip()).bifurcating()
 
     if verbose:
-        print("SUPERFINE:", sup_tree)
+        # print("SUPERFINE:", sup_tree)
         print("SCS:", scs_tree)
         print("BCD", bcd_tree)
         if min_cut:
@@ -130,11 +175,11 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
     with open(model_tree_file, "r") as f:
         model = make_tree(f.read().strip()).bifurcating()  # .unrooted()
 
-    if sup_tree is not None:
-        # print(sup_tree.lin_rajan_moret(scs_tree))
-        print(
-            f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}, {grf_distance_slow(model, sup_tree)}, MAT={cluster_matching_distance(model, sup_tree)}"
-        )
+    # if sup_tree is not None:
+    #     # print(sup_tree.lin_rajan_moret(scs_tree))
+    #     print(
+    #         f"SUP: time={sup_time:.2f} RF={rf_distance(model, sup_tree)} GRF={grf_distance(model, sup_tree)}, {grf_distance_slow(model, sup_tree)}, MAT={cluster_matching_distance(model, sup_tree)}"
+    #     )
     print(
         f"SCS: time={scs_time:.2f} RF={rf_distance(model, scs_tree)} GRF={grf_distance(model, scs_tree)}, {grf_distance_slow(model, scs_tree)}, MAT={cluster_matching_distance(model, scs_tree)}"
     )
@@ -159,12 +204,13 @@ if __name__ == "__main__":
     # file = "data/superfine/500-taxa/20/sm_data.10"
 
     # report(file + ".source_trees", file + ".model_tree", False)
-    taxa = 800
-    for i in range(10):  # range(10):
+    taxa = 400
+    methods = [SCS, BCD]
+    for i in range(10):
         print(f"Results for {i}:")
         file = f"birth_death/{taxa}_taxa/{i}"
         # file = f"data/superfine/500-taxa/100/sm_data.{i}"
-        report(file + ".source_trees", file + ".model_tree", False)
+        run_methods(file + ".source_trees", file + ".model_tree", methods)
 
     # file = "data/superfine/100-taxa/20/sm_data.3"
     # report(file + ".source_trees", file + ".model_tree", False)
