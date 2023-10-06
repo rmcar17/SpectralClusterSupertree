@@ -204,12 +204,20 @@ if __name__ == "__main__":
     # file = "data/superfine/500-taxa/20/sm_data.10"
 
     # report(file + ".source_trees", file + ".model_tree", False)
-    taxa = 400
+    # taxa = 400
+    # methods = [SCS, BCD]
+    # for i in range(10):
+    #     print(f"Results for {i}:")
+    #     file = f"birth_death/{taxa}_taxa/{i}"
+    #     # file = f"data/superfine/500-taxa/100/sm_data.{i}"
+    #     run_methods(file + ".source_trees", file + ".model_tree", methods)
+
+    taxa = 100
+    density = 20
     methods = [SCS, BCD]
     for i in range(10):
-        print(f"Results for {i}:")
-        file = f"birth_death/{taxa}_taxa/{i}"
-        # file = f"data/superfine/500-taxa/100/sm_data.{i}"
+        file = f"data/superfine/{taxa}-taxa/{density}/sm_data.{i}"
+        print(f"Results for {i} ({file}):")
         run_methods(file + ".source_trees", file + ".model_tree", methods)
 
     # file = "data/superfine/100-taxa/20/sm_data.3"
