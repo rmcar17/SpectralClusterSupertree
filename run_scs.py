@@ -12,7 +12,9 @@ def parse_trees(file_path: str) -> List[PhyloNode]:
     trees = []
     with open(file_path, "r") as f:
         for line in f:
-            trees.append(make_tree(line.strip()))
+            line = line.strip()
+            if len(line) > 0:
+                trees.append(make_tree(line.strip()))
             # print(line.strip())
     return trees
 

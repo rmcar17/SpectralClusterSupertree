@@ -198,6 +198,49 @@ def report(source_tree_file, model_tree_file, min_cut=False, verbose=False):
         )
 
 
+def run_experiment_super_triplets(d: int, k: int, methods: List):
+    assert d in [25, 50, 75]
+    assert k in [10, 20, 30, 40, 50]
+
+    number_of_experiments = 100
+
+    for i in range(number_of_experiments):
+        tree_number = i + 1
+        source_file = f"bcd/data/SuperTripletsBenchmark/source-trees/d{d}/k{k}/data-d{d}-k{k}-{tree_number}_phybp-s0r.nwk.source_trees"
+        model_file = f"bcd/data/SuperTripletsBenchmark/model-trees/model-{tree_number}.nwk.model_tree"
+        print(f"Results for {i} ({source_file}):")
+        run_methods(source_file, model_file, methods)
+
+
+def run_experiment_smidgen(taxa: int, density: int, methods: List):
+    assert taxa in [100, 500, 1000]
+    assert density in [20, 50, 75, 100]
+
+    number_of_experiments = 10 if taxa == 1000 else 30
+
+    for i in range(number_of_experiments):
+        file = f"data/superfine/{taxa}-taxa/{density}/sm_data.{i}"
+        print(f"Results for {i} ({file}):")
+        run_methods(file + ".source_trees", file + ".model_tree", methods)
+
+
+def run_experiment_smidgen_og(taxa: int, density: int, methods: List):
+    assert taxa in [100, 500, 1000, 10000]
+    if taxa == 10000:
+        assert density == 0
+    else:
+        assert density in [20, 50, 75, 100]
+
+    number_of_experiments = 30 if taxa != 10000 else 10
+
+    for i in range(number_of_experiments):
+        # source_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/ModelSourceTrees/smo.{i}.modelSourceTrees.tre"
+        source_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/RaxML/smo.{i}.sourceTreesOG.tre"
+        model_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Model_Trees/pruned/smo.{i}.modelTree.tre"
+        print(f"Results for {i} ({source_file}):")
+        run_methods(source_file, model_file, methods)
+
+
 if __name__ == "__main__":
     # simulated_experiment(100, 20)
     # file = "data/superfine/500-taxa/20/sm_data.5" # Sup doesn't resolve for 5
@@ -212,13 +255,14 @@ if __name__ == "__main__":
     #     # file = f"data/superfine/500-taxa/100/sm_data.{i}"
     #     run_methods(file + ".source_trees", file + ".model_tree", methods)
 
-    taxa = 100
-    density = 20
+    # taxa = 500
+    # density = 20
     methods = [SCS, BCD]
-    for i in range(10):
-        file = f"data/superfine/{taxa}-taxa/{density}/sm_data.{i}"
-        print(f"Results for {i} ({file}):")
-        run_methods(file + ".source_trees", file + ".model_tree", methods)
+    # run_experiment_smidgen(taxa, density, methods)
+
+    # run_experiment_super_triplets(75, 10, methods)
+
+    run_experiment_smidgen_og(100, 20, methods)
 
     # file = "data/superfine/100-taxa/20/sm_data.3"
     # report(file + ".source_trees", file + ".model_tree", False)

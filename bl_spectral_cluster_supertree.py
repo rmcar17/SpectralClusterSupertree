@@ -183,6 +183,7 @@ def spectral_cluster_graph(
             edges[i, j] = edge_weights.get(edge_tuple(v1, v2), 0)
     # print("SLOW? TOOK", time.time() - start)
     # print(f"SPARSITY: {1-np.count_nonzero(edges)/edges.size}")
+    # print(vertices)
     idxs = sc.fit_predict(edges)
 
     partition = [set(), set()]
@@ -463,7 +464,9 @@ def _proper_cluster_graph_edges(
             # print("Len", len(names))
             for i in range(0, len(tips)):
                 ni = (tips[i].name,)
-                max_weights[ni] += weight  # TODO: update how max weights are handled
+                max_weights[ni] += (
+                    weight * 10000000000
+                )  # TODO: update how max weights are handled
                 for j in range(i):
                     nj = (tips[j].name,)
                     edges[ni].add(nj)
@@ -486,9 +489,20 @@ def last_common_ancestor_weight(tip_1: TreeNode, tip_2: TreeNode) -> float:
     assert lca.parent != None
 
     length = 0.0
+
+    doing_unit = False
+    doing_branch = False
+
     while lca.parent is not None:
-        length += getattr(lca, "length")
+        if hasattr(lca, "length") and getattr(lca, "length") is not None:
+            length += getattr(lca, "length")
+            doing_branch = True
+        else:
+            length += 1
+            doing_unit = True
         lca = lca.parent
+
+    assert not doing_branch and doing_unit
 
     return length
 
