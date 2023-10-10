@@ -75,9 +75,13 @@ SCRIPTS = {
 }
 
 
-def run_methods(source_tree_file: str, model_tree_file: str, methods: List[str]):
+def run_methods(
+    source_tree_file: str, model_tree_file: str, methods: List[str], verbosity=1
+):
     results = {}
     for method in methods:
+        if verbosity >= 2:
+            print("Running Method", method)
         start_time = time.time()
         result = subprocess.run(
             [SCRIPTS[method], source_tree_file],
@@ -96,13 +100,16 @@ def run_methods(source_tree_file: str, model_tree_file: str, methods: List[str])
 
     for method in methods:
         tree, time_result = results[method]
-        if tree is None:
-            print(f"{method}: time={time_result:.2f}s failed: {source_tree_file}) ")
-        else:
-            rf = rf_distance(model, tree)
-            grf = grf_distance(model, tree)
-            mat = cluster_matching_distance(model, tree)
-            print(f"{method}: time={time_result:.2f}s RF={rf} MAT={mat} GRF={grf}")
+        if verbosity >= 1:
+            if verbosity >= 2:
+                print("Computing distances for", method)
+            if tree is None:
+                print(f"{method}: time={time_result:.2f}s failed: {source_tree_file}) ")
+            else:
+                rf = rf_distance(model, tree)
+                grf = grf_distance(model, tree)
+                mat = cluster_matching_distance(model, tree)
+                print(f"{method}: time={time_result:.2f}s RF={rf} MAT={mat} GRF={grf}")
 
     return results
 
@@ -224,7 +231,9 @@ def run_experiment_smidgen(taxa: int, density: int, methods: List):
         run_methods(file + ".source_trees", file + ".model_tree", methods)
 
 
-def run_experiment_smidgen_og(taxa: int, density: int, methods: List):
+def run_experiment_smidgen_og(
+    taxa: int, density: int, methods: List, verbosity: int = 1
+):
     assert taxa in [100, 500, 1000, 10000]
     if taxa == 10000:
         assert density == 0
@@ -237,8 +246,9 @@ def run_experiment_smidgen_og(taxa: int, density: int, methods: List):
         # source_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/ModelSourceTrees/smo.{i}.modelSourceTrees.tre"
         source_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/RaxML/smo.{i}.sourceTreesOG.tre"
         model_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Model_Trees/pruned/smo.{i}.modelTree.tre"
-        print(f"Results for {i} ({source_file}):")
-        run_methods(source_file, model_file, methods)
+        if verbosity >= 1:
+            print(f"Results for {i} ({source_file}):")
+        run_methods(source_file, model_file, methods, verbosity=verbosity)
 
 
 if __name__ == "__main__":
@@ -262,7 +272,9 @@ if __name__ == "__main__":
 
     # run_experiment_super_triplets(75, 10, methods)
 
-    run_experiment_smidgen_og(100, 20, methods)
+    taxa = 10000
+    density = 0
+    run_experiment_smidgen_og(taxa, density, methods, verbosity=2)
 
     # file = "data/superfine/100-taxa/20/sm_data.3"
     # report(file + ".source_trees", file + ".model_tree", False)

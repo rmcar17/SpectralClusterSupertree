@@ -502,7 +502,7 @@ def last_common_ancestor_weight(tip_1: TreeNode, tip_2: TreeNode) -> float:
             doing_unit = True
         lca = lca.parent
 
-    assert not doing_branch and doing_unit
+    assert not (doing_branch and doing_unit)
 
     return length
 
