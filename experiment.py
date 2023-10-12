@@ -213,8 +213,8 @@ def run_experiment_super_triplets(d: int, k: int, methods: List):
 
     for i in range(number_of_experiments):
         tree_number = i + 1
-        source_file = f"bcd/data/SuperTripletsBenchmark/source-trees/d{d}/k{k}/data-d{d}-k{k}-{tree_number}_phybp-s0r.nwk.source_trees"
-        model_file = f"bcd/data/SuperTripletsBenchmark/model-trees/model-{tree_number}.nwk.model_tree"
+        source_file = f"data/SuperTripletsBenchmark/source-trees/d{d}/k{k}/data-d{d}-k{k}-{tree_number}_phybp-s0r.nwk.source_trees"
+        model_file = f"data/SuperTripletsBenchmark/model-trees/model-{tree_number}.nwk.model_tree"
         print(f"Results for {i} ({source_file}):")
         run_methods(source_file, model_file, methods)
 
@@ -244,8 +244,8 @@ def run_experiment_smidgen_og(
 
     for i in range(number_of_experiments):
         # source_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/ModelSourceTrees/smo.{i}.modelSourceTrees.tre"
-        source_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/RaxML/smo.{i}.sourceTreesOG.tre"
-        model_file = f"bcd/data/SMIDGenOutgrouped/{taxa}/{density}/Model_Trees/pruned/smo.{i}.modelTree.tre"
+        source_file = f"data/SMIDGenOutgrouped/{taxa}/{density}/Source_Trees/RaxML/smo.{i}.sourceTreesOG.tre"
+        model_file = f"data/SMIDGenOutgrouped/{taxa}/{density}/Model_Trees/pruned/smo.{i}.modelTree.tre"
         if verbosity >= 1:
             print(f"Results for {i} ({source_file}):")
         run_methods(source_file, model_file, methods, verbosity=verbosity)
