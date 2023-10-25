@@ -267,13 +267,13 @@ if __name__ == "__main__":
 
     # taxa = 500
     # density = 20
-    methods = [SCS, BCD]
+    methods = [SCS]  # , BCD]
     # run_experiment_smidgen(taxa, density, methods)
 
     # run_experiment_super_triplets(75, 10, methods)
 
-    taxa = 10000
-    density = 0
+    taxa = 100
+    density = 20
     run_experiment_smidgen_og(taxa, density, methods, verbosity=2)
 
     # file = "data/superfine/100-taxa/20/sm_data.3"

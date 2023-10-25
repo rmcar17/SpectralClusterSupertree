@@ -4,12 +4,19 @@ from cogent3 import make_tree
 from cogent3.core.tree import TreeNode, PhyloNode
 import os
 
+USE_NEW = False
 # from spectral_cluster_supertree import (
 #     spectral_cluster_supertree as spectral_cluster_supertree,
 # )
-from bl_spectral_cluster_supertree import (
-    bl_spectral_cluster_supertree as spectral_cluster_supertree,
-)
+if USE_NEW:
+    from new_spectral_cluster_supertree import spectral_cluster_supertree as s
+
+    spectral_cluster_supertree = lambda trees: s(trees)
+else:
+    from spectral_cluster_supertree import spectral_cluster_supertree
+# from bl_spectral_cluster_supertree import (
+#     bl_spectral_cluster_supertree as spectral_cluster_supertree,
+# )
 
 
 def parse_trees(file_path: str) -> List[PhyloNode]:
