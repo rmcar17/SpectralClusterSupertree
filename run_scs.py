@@ -4,14 +4,16 @@ from cogent3 import make_tree
 from cogent3.core.tree import TreeNode, PhyloNode
 import os
 
-USE_NEW = False
+USE_NEW = True
 # from spectral_cluster_supertree import (
 #     spectral_cluster_supertree as spectral_cluster_supertree,
 # )
 if USE_NEW:
     from new_spectral_cluster_supertree import spectral_cluster_supertree as s
 
-    spectral_cluster_supertree = lambda trees: s(trees)
+    spectral_cluster_supertree = lambda trees: s(
+        trees, pcg_weighting="depth", normalise_pcg_weights=False, contract_edges=False
+    )
 else:
     from spectral_cluster_supertree import spectral_cluster_supertree
 # from bl_spectral_cluster_supertree import (

@@ -26,7 +26,6 @@ https://www.sciencedirect.com/science/article/pii/S0167739X16300814 (it also tal
 Finally found superfine https://github.com/dtneves/SuperFine
 """
 
-import math
 from typing import (
     Callable,
     Collection,
@@ -42,7 +41,6 @@ from typing import (
 import numpy as np
 from cogent3.core.tree import TreeBuilder, TreeNode, PhyloNode
 from sklearn.cluster import SpectralClustering
-from spectral_cluster_supertree import _proper_cluster_graph_edges as pcge
 
 
 def spectral_cluster_supertree(
