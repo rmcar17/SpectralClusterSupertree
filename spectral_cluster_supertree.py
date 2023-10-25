@@ -1,4 +1,6 @@
 """
+Includes argument to handle branch lenghts
+
 Spectral Cluster Supertree
 
 Link to Original Min-Cut Supertree: https://www.sciencedirect.com/science/article/pii/S0166218X0000202X
@@ -24,17 +26,29 @@ https://www.sciencedirect.com/science/article/pii/S0167739X16300814 (it also tal
 Finally found superfine https://github.com/dtneves/SuperFine
 """
 
-import math
-import time
-from typing import Collection, Dict, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import (
+    Callable,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 import numpy as np
-from cogent3.core.tree import TreeBuilder, TreeNode
+from cogent3.core.tree import TreeBuilder, TreeNode, PhyloNode
 from sklearn.cluster import SpectralClustering
 
 
 def spectral_cluster_supertree(
-    trees: Sequence[TreeNode], weights: Optional[Sequence[float]] = None
+    trees: Sequence[TreeNode],
+    pcg_weighting: str = "one",
+    normalise_pcg_weights: bool = False,
+    contract_edges: bool = True,
+    weights: Optional[Sequence[float]] = None,
 ) -> TreeNode:
     """
     Spectral Cluster Supertree (SCS).
@@ -55,13 +69,17 @@ def spectral_cluster_supertree(
     """
 
     assert len(trees) >= 1, "there must be at least one tree"
-    # print("CALLING ON", trees)
+
+    assert pcg_weighting in ["one", "branch", "depth"]
 
     # Input trees are of equal weight if none is specified
     if weights is None:
         weights = [1.0 for _ in range(len(trees))]
 
     assert len(trees) == len(weights), "trees and weights must be of same length"
+
+    if len(trees) == 1:  # If there is only one tree left, we can simply graft it on
+        return trees[0]
 
     # The vertices of the proper cluster graph
     # are the names of the tips of all trees
@@ -74,35 +92,30 @@ def spectral_cluster_supertree(
 
     pcg_vertices = set((name,) for name in all_names)
 
-    # print("STARTING PCG")
-    # start = time.time()
-    pcg_edges, pcg_weights, max_weights = _proper_cluster_graph_edges(
-        pcg_vertices, trees, weights
+    (
+        pcg_edges,
+        pcg_weights,
+        taxa_ocurrences,
+        taxa_co_occurrences,
+    ) = _proper_cluster_graph_edges(
+        pcg_vertices, trees, weights, pcg_weighting, normalise_pcg_weights
     )
-    # print("TOOK", time.time() - start)
 
-    # print("STARTING COMP")
-    # start = time.time()
     components = _get_graph_components(pcg_vertices, pcg_edges)
-    # print("TOOK", time.time() - start)
 
     if len(components) == 1:
-        # TODO: If there the graph is connected, then need to perform spectral clustering
-        # to find "best" components
-
-        # Modifies the proper cluster graph inplace
-        # print("START CONTRACT")
-        # start = time.time()
-        _contract_proper_cluster_graph(
-            pcg_vertices, pcg_edges, pcg_weights, max_weights, trees, weights
-        )
-        # all_total[0] += time.time() - start
-        # print("TOOK", time.time() - start)
-
-        # print("START CLUSTER")
-        # start = time.time()
+        if contract_edges:
+            # Modifies the proper cluster graph inplace
+            _contract_proper_cluster_graph(
+                pcg_vertices,
+                pcg_edges,
+                pcg_weights,
+                taxa_ocurrences,
+                taxa_co_occurrences,
+                trees,
+                weights,
+            )
         components = spectral_cluster_graph(pcg_vertices, pcg_weights)
-        # print("TOOK", time.time() - start)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
@@ -113,8 +126,6 @@ def spectral_cluster_supertree(
     # post-processing step?
     # Slightly frustrating since spectral clustering will
     # always generate two components.
-
-    # print("GOT COMPONENTS", components)
 
     for component in components:
         component = component_to_names_set(component)
@@ -128,14 +139,20 @@ def spectral_cluster_supertree(
         # and recursively call SCS
 
         # Note, inducing could possible remove trees.
-        # print("BEFORE INDUCING", trees, "ON", component)
         new_induced_trees, new_weights = _generate_induced_trees_with_weights(
             component, trees, weights
         )
-        # print("AFTER INDUCING", new_induced_trees)
 
         # Find the supertree for the induced trees
-        child_trees.append(spectral_cluster_supertree(new_induced_trees, new_weights))
+        child_trees.append(
+            spectral_cluster_supertree(
+                new_induced_trees,
+                pcg_weighting,
+                normalise_pcg_weights,
+                contract_edges,
+                new_weights,
+            )
+        )
 
         # It is possible that some tip names are missed (particularly
         # if inducing would only leave length 1). TODO: think more about when this case
@@ -179,9 +196,6 @@ def spectral_cluster_graph(
     Returns:
         List[Set]: A bipartition of the vertices
     """
-
-    # TODO: assign labels also allows kmeans, and something else which looks less useful
-    # Do they have an effect on the performance?
     sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans", n_jobs=1)
 
     # Order vertices
@@ -194,15 +208,13 @@ def spectral_cluster_graph(
     # kind of automatic selection that can be performed?
     edges = np.zeros((len(vertex_list), len(vertex_list)))
 
-    # TODO: This is horridly inefficient. Generate mapping from vertices to indices
-    # and iterate over edges instead as this will likely be semi-sparse
-    # print("START SLOW?")
-    # start = time.time()
+    # TODO: This is horridly inefficient (well not in practice). Generate
+    # mapping from vertices to indices and iterate over edges instead as
+    # this will likely be semi-sparse
     for i, v1 in enumerate(vertex_list):
         for j, v2 in enumerate(vertex_list):
             edges[i, j] = edge_weights.get(edge_tuple(v1, v2), 0)
-    # print("SLOW? TOOK", time.time() - start)
-    # print(f"SPARSITY: {1-np.count_nonzero(edges)/edges.size}")
+
     idxs = sc.fit_predict(edges)
 
     partition = [set(), set()]
@@ -216,7 +228,8 @@ def _contract_proper_cluster_graph(
     vertices: Set,
     edges: Dict,
     edge_weights: Dict[Tuple, float],
-    max_weights: Dict[Tuple, float],
+    taxa_occurrences: Dict[Tuple, int],
+    taxa_co_occurrences: Dict[Tuple, int],
     trees: Sequence[TreeNode],
     weights: Sequence[float],
 ) -> None:
@@ -240,22 +253,20 @@ def _contract_proper_cluster_graph(
         trees (Sequence[TreeNode]): The input trees
         weights (Sequence[float]): The weights of the input trees
     """
-    # max_possible_weight = sum(weights)
-
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
     max_vertices = set()
     max_edges = {}
-    for edge, weight in edge_weights.items():
-        u, v = edge
-        max_possible_weight = max(max_weights[u], max_weights[v])
-        if math.isclose(weight, max_possible_weight):
+    for pair, count in taxa_co_occurrences.items():
+        u, v = pair
+        max_possible_count = max(taxa_occurrences[u], taxa_occurrences[v])
+        if count == max_possible_count:
             # Add the connecting vertices to the graph
-            for v in edge:
+            for v in pair:
                 max_vertices.add(v)
                 if v not in max_edges:
                     max_edges[v] = set()
-            u, v = edge
+            u, v = pair
             max_edges[u].add(v)
             max_edges[v].add(u)
 
@@ -295,12 +306,6 @@ def _contract_proper_cluster_graph(
 
                 # Otherwise we are connecting to something outside
                 # of this contraction
-                # new_edge_pair = frozenset(
-                #     (
-                #         new_vertex,
-                #         vertex_to_contraction.get(neighbour, neighbour),
-                #     )  # Be careful if the neighbour is in a different contraction
-                # )
                 new_edge_pair = edge_tuple(
                     new_vertex, vertex_to_contraction.get(neighbour, neighbour)
                 )
@@ -367,9 +372,6 @@ def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
     return tree_builder(None, trees)
 
 
-KEEP_DIRECTION = True
-
-
 def _generate_induced_trees_with_weights(
     names: Set, trees: Sequence[TreeNode], weights: Sequence[float]
 ) -> Tuple[List[TreeNode], List[float]]:
@@ -399,11 +401,8 @@ def _generate_induced_trees_with_weights(
         # there is no point inducing (no proper clusters)
         if len(names.intersection(tree.get_tip_names())) < 2:
             continue
-        if KEEP_DIRECTION:
-            induced_trees.append(tree._get_sub_tree(names))
-            induced_trees[-1].name = "root"
-        else:
-            induced_trees.append(tree.get_sub_tree(names, ignore_missing=True))
+        induced_trees.append(tree._get_sub_tree(names))
+        induced_trees[-1].name = "root"
         new_weights.append(weight)
 
     return induced_trees, new_weights
@@ -441,8 +440,14 @@ def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
 
 
 def _proper_cluster_graph_edges(
-    pcg_vertices: Set, trees: Sequence[TreeNode], weights: Sequence[float]
-) -> Tuple[Dict[Tuple, Set[Tuple]], Dict[Tuple, float], Dict[Tuple, float]]:
+    pcg_vertices: Set,
+    trees: Sequence[TreeNode],
+    weights: Sequence[float],
+    pcg_weighting: str,
+    normalise_pcg_weights: bool,
+) -> Tuple[
+    Dict[Tuple, Set[Tuple]], Dict[Tuple, float], Dict[Tuple, int], Dict[Tuple, int]
+]:
     """Constructs a proper cluster graph for a collection of weighted trees.
 
     For a tree, two leaves belong to a proper cluster if the path connecting
@@ -464,34 +469,94 @@ def _proper_cluster_graph_edges(
     """
     edges = {}
     edge_weights = {}
-    max_weights = {}  # Max weight possible for each vertex
+    taxa_occurrences = {}
+    taxa_co_occurrences = {}  # Number of times a taxa appears
 
     for vertex in pcg_vertices:
         edges[vertex] = set()
-        max_weights[vertex] = 0
+        taxa_occurrences[vertex] = 0
 
-    # total = 0
+    assert pcg_weighting in ["one", "branch", "depth"]
 
+    if pcg_weighting == "one":
+        length_function = lambda length, tree: 1
+    elif pcg_weighting == "depth":
+        length_function = lambda length, tree: length + 1
+    else:
+        length_function = lambda length, tree: length + tree.length
+
+    normalise_length = 0
     for tree, weight in zip(trees, weights):
-        # TODO: Should I error if more than two children?
         for side in tree:
-            names = side.get_tip_names()
-            # start = time.time()
-            # print("Len", len(names))
-            for i in range(0, len(names)):
-                ni = (names[i],)
-                max_weights[ni] += weight
-                for j in range(i):
-                    nj = (names[j],)
-                    edges[ni].add(nj)
-                    edges[nj].add(ni)
+            side_taxa, max_sublength = dfs_pcg_weights(
+                edges,
+                edge_weights,
+                taxa_co_occurrences,
+                side,
+                weight,
+                0,
+                length_function,
+            )
+            for taxa in side_taxa:
+                taxa_occurrences[taxa] += 1
+            normalise_length = max(normalise_length, max_sublength)
+    if normalise_pcg_weights:
+        for edge in edge_weights:
+            edge_weights[edge] /= normalise_length
 
-                    edge = edge_tuple(ni, nj)
-                    edge_weights[edge] = edge_weights.get(edge, 0) + weight
-            # total += time.time() - start
-    # print("CONSTRUCTION PART", total)
-    # print(len(trees))
-    return edges, edge_weights, max_weights
+    return edges, edge_weights, taxa_occurrences, taxa_co_occurrences
+
+
+def dfs_pcg_weights(
+    edges: Dict[Tuple, Set[Tuple]],
+    edge_weights: Dict[Tuple, float],
+    taxa_co_occurrences: Dict[Tuple, float],
+    tree: PhyloNode,
+    tree_weight: float,
+    length: float,
+    length_function: Callable[[float, PhyloNode], float],
+) -> Tuple[List, float]:
+    if tree.is_tip():
+        return [(tree.name,)], 0.0
+
+    length = length_function(length, tree)
+
+    max_length = length
+    children_tips = []
+    for side in tree:
+        child_tips, normalise_length = dfs_pcg_weights(
+            edges,
+            edge_weights,
+            taxa_co_occurrences,
+            side,
+            tree_weight,
+            length,
+            length_function,
+        )
+        children_tips.append(child_tips)
+        max_length = max(max_length, normalise_length)
+
+    # Add edges to the graph
+    for i in range(1, len(children_tips)):
+        child_tips_1 = children_tips[i]
+        for j in range(i):
+            child_tips_2 = children_tips[j]
+
+            for taxa_1 in child_tips_1:
+                for taxa_2 in child_tips_2:
+                    edges[taxa_1].add(taxa_2)
+                    edges[taxa_2].add(taxa_1)
+
+                    edge = edge_tuple(taxa_1, taxa_2)
+                    edge_weights[edge] = (
+                        edge_weights.get(edge, 0) + length * tree_weight
+                    )
+                    taxa_co_occurrences[edge] = taxa_co_occurrences.get(edge, 0) + 1
+
+    for i in range(1, len(children_tips)):
+        children_tips[0].extend(children_tips[i])
+
+    return children_tips[0], max_length
 
 
 def edge_tuple(v1, v2):

@@ -4,21 +4,7 @@ from cogent3 import make_tree
 from cogent3.core.tree import TreeNode, PhyloNode
 import os
 
-USE_NEW = True
-# from spectral_cluster_supertree import (
-#     spectral_cluster_supertree as spectral_cluster_supertree,
-# )
-if USE_NEW:
-    from new_spectral_cluster_supertree import spectral_cluster_supertree as s
-
-    spectral_cluster_supertree = lambda trees: s(
-        trees, pcg_weighting="depth", normalise_pcg_weights=False, contract_edges=False
-    )
-else:
-    from spectral_cluster_supertree import spectral_cluster_supertree
-# from bl_spectral_cluster_supertree import (
-#     bl_spectral_cluster_supertree as spectral_cluster_supertree,
-# )
+from spectral_cluster_supertree import spectral_cluster_supertree
 
 
 def parse_trees(file_path: str) -> List[PhyloNode]:
@@ -95,5 +81,7 @@ def create_simulated_supertrees(taxa: int, density: int):
 
 if __name__ == "__main__":
     input_trees = parse_trees(sys.argv[1])
-    supertree = spectral_cluster_supertree(input_trees)
+    supertree = spectral_cluster_supertree(
+        input_trees, pcg_weighting="branch", contract_edges=False
+    )
     print(supertree)
