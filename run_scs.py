@@ -82,6 +82,6 @@ def create_simulated_supertrees(taxa: int, density: int):
 if __name__ == "__main__":
     input_trees = parse_trees(sys.argv[1])
     supertree = spectral_cluster_supertree(
-        input_trees, pcg_weighting="branch", contract_edges=False
+        input_trees, pcg_weighting="branch", contract_edges=True
     )
     print(supertree)

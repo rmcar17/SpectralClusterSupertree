@@ -335,24 +335,7 @@ def _contract_proper_cluster_graph(
         edges[u].add(v)
         edges[v].add(u)
 
-        if len(new_edge_weights[edge]) == 1:
-            edge_weights[edge] = new_edge_weights[edge][0]
-        else:
-            edge_weight = 0
-
-            u = set(u)
-            v = set(v)
-
-            for tree, tree_weight in zip(trees, weights):
-                for child in tree:
-                    # TODO: efficiency here can be improved as we only need to find one element in common
-                    if not u.isdisjoint(child.get_tip_names()) and not v.isdisjoint(
-                        child.get_tip_names()
-                    ):
-                        # The tree supports the endpoints belonging to a proper cluster
-                        edge_weight += tree_weight
-
-            edge_weights[edge] = edge_weight
+        edge_weights[edge] = max(new_edge_weights[edge])
 
 
 def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
