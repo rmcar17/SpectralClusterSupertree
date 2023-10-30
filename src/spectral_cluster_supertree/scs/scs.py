@@ -134,7 +134,7 @@ def spectral_cluster_supertree(
     # always generate two components.
 
     for component in components:
-        component = component_to_names_set(component)
+        component = _component_to_names_set(component)
         # Trivial case for if the size of the component is <=2
         # Simply add a tree expressing that
         if len(component) <= 2:
@@ -174,7 +174,7 @@ def spectral_cluster_supertree(
     return supertree
 
 
-def component_to_names_set(component: Set[Tuple]) -> Set:
+def _component_to_names_set(component: Set[Tuple]) -> Set:
     names_set = set()
     for c in component:
         names_set.update(c)
