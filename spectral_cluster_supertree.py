@@ -47,6 +47,7 @@ def spectral_cluster_supertree(
     trees: Sequence[TreeNode],
     pcg_weighting: str = "one",
     normalise_pcg_weights: bool = False,
+    depth_normalisation: bool = False,
     contract_edges: bool = True,
     weights: Optional[Sequence[float]] = None,
 ) -> TreeNode:
@@ -98,7 +99,12 @@ def spectral_cluster_supertree(
         taxa_ocurrences,
         taxa_co_occurrences,
     ) = _proper_cluster_graph_edges(
-        pcg_vertices, trees, weights, pcg_weighting, normalise_pcg_weights
+        pcg_vertices,
+        trees,
+        weights,
+        pcg_weighting,
+        normalise_pcg_weights,
+        depth_normalisation,
     )
 
     components = _get_graph_components(pcg_vertices, pcg_edges)
@@ -149,6 +155,7 @@ def spectral_cluster_supertree(
                 new_induced_trees,
                 pcg_weighting,
                 normalise_pcg_weights,
+                depth_normalisation,
                 contract_edges,
                 new_weights,
             )
@@ -428,6 +435,7 @@ def _proper_cluster_graph_edges(
     weights: Sequence[float],
     pcg_weighting: str,
     normalise_pcg_weights: bool,
+    depth_normalisation: bool,
 ) -> Tuple[
     Dict[Tuple, Set[Tuple]], Dict[Tuple, float], Dict[Tuple, int], Dict[Tuple, int]
 ]:
@@ -470,6 +478,19 @@ def _proper_cluster_graph_edges(
 
     normalise_length = 0
     for tree, weight in zip(trees, weights):
+        depth_normalisation_factor = 1
+        if depth_normalisation:
+            max_length = 0
+            for tip in tree.tips():
+                length = 0
+                while tip.parent is not None:
+                    if hasattr(tip, "length"):
+                        length += getattr(tip, "length")
+                    else:
+                        length += 1
+                    tip = tip.parent
+                max_length = max(max_length, length)
+            depth_normalisation_factor = max_length
         for side in tree:
             side_taxa, max_sublength = dfs_pcg_weights(
                 edges,
@@ -479,6 +500,7 @@ def _proper_cluster_graph_edges(
                 weight,
                 0,
                 length_function,
+                depth_normalisation_factor,
             )
             for taxa in side_taxa:
                 taxa_occurrences[taxa] += 1
@@ -498,6 +520,7 @@ def dfs_pcg_weights(
     tree_weight: float,
     length: float,
     length_function: Callable[[float, PhyloNode], float],
+    depth_normalisation_factor: int,
 ) -> Tuple[List, float]:
     if tree.is_tip():
         return [(tree.name,)], 0.0
@@ -515,6 +538,7 @@ def dfs_pcg_weights(
             tree_weight,
             length,
             length_function,
+            depth_normalisation_factor,
         )
         children_tips.append(child_tips)
         max_length = max(max_length, normalise_length)
@@ -532,7 +556,8 @@ def dfs_pcg_weights(
 
                     edge = edge_tuple(taxa_1, taxa_2)
                     edge_weights[edge] = (
-                        edge_weights.get(edge, 0) + length * tree_weight
+                        edge_weights.get(edge, 0)
+                        + length * tree_weight / depth_normalisation_factor
                     )
                     taxa_co_occurrences[edge] = taxa_co_occurrences.get(edge, 0) + 1
 
