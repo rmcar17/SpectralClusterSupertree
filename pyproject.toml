@@ -1,0 +1,77 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.4"]
+
+[project]
+authors = [{name = "Robert McArthur", email = "robert.mcarthur@anu.edu.au"}]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: BSD License",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.10",
+]
+dependencies = ["click", "numpy", "scitrack"]
+keywords = [
+  "supertree",
+  "phylogeny",
+  "biology",
+  "bioinformatics",
+]
+license = {file = "LICENSE"}
+name = "spectral_cluster_supertree"
+readme = "README.md"
+requires-python = ">=3.10"
+# the following are inferred from the source code
+dynamic = ["version", "description"]
+
+[project.sdist]
+exclude = ["doc/*.html"]
+include = ["doc/", "requirements.txt", "src/*", "pyproject.toml"]
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "click",
+  "docformatter",
+  "flit",
+  "isort",
+  "pytest",
+  "pytest-cov",
+  "pytest-xdist",
+  "nox",
+]
+test = ["pytest", "pytest-cov", "pytest-xdist", "nox"]
+
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "-ra"]
+testpaths = "tests"
+
+[tool.black]
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | build
+  | doc
+  | dist
+  | tests/data
+)/
+'''
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+atomic = true
+force_grid_wrap = 0
+include_trailing_comma = true
+lines_after_imports = 2
+lines_between_types = 1
+multi_line_output = 3
+use_parentheses = true

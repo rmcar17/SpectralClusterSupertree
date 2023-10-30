@@ -3,7 +3,7 @@ from typing import List, Optional, Sequence, Union
 from cogent3.core.tree import TreeNode
 import multiprocessing as mp
 from parallel_util import MergeResultOfTasks, Task, TaskDistributor, TaskResult
-from spectral_cluster_supertree import spectral_cluster_supertree
+from spectral_cluster_supertree import scs
 from cogent3 import make_tree
 
 
@@ -43,7 +43,7 @@ def parallel_spectral_cluster_supertree(
     num_workers: int = mp.cpu_count() - 1,
 ) -> TreeNode:
     if num_workers == 0:
-        return spectral_cluster_supertree(trees, weights)
+        return scs(trees, weights)
 
     print("INIT DIST")
     distributor = TaskDistributor(num_workers)
