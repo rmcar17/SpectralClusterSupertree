@@ -80,6 +80,7 @@ def spectral_cluster_supertree(
     assert len(trees) == len(weights), "trees and weights must be of same length"
 
     if len(trees) == 1:  # If there is only one tree left, we can simply graft it on
+        _denamify(trees[0])
         return trees[0]
 
     # The vertices of the proper cluster graph
@@ -172,6 +173,11 @@ def spectral_cluster_supertree(
     # Connect the child trees by making adjacent to a new root.
     supertree = _connect_trees(child_trees)
     return supertree
+
+
+def _denamify(tree: TreeNode):
+    for node in tree.iter_nontips(include_self=True):
+        node.name = None
 
 
 def _component_to_names_set(component: Set[Tuple]) -> Set:
