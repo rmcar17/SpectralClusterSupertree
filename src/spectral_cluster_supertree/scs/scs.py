@@ -50,6 +50,7 @@ def spectral_cluster_supertree(
     depth_normalisation: bool = False,
     contract_edges: bool = True,
     weights: Optional[Sequence[float]] = None,
+    random_state: np.random.RandomState = np.random.RandomState(),
 ) -> TreeNode:
     """
     Spectral Cluster Supertree (SCS).
@@ -120,7 +121,7 @@ def spectral_cluster_supertree(
                 taxa_ocurrences,
                 taxa_co_occurrences,
             )
-        components = spectral_cluster_graph(pcg_vertices, pcg_weights)
+        components = spectral_cluster_graph(pcg_vertices, pcg_weights, random_state)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
@@ -150,6 +151,7 @@ def spectral_cluster_supertree(
                 depth_normalisation,
                 contract_edges,
                 new_weights,
+                random_state,
             )
         )
 
@@ -176,7 +178,7 @@ def _component_to_names_set(component: Set[Tuple]) -> Set:
 
 
 def spectral_cluster_graph(
-    vertices: Set, edge_weights: Dict[Tuple, float]
+    vertices: Set, edge_weights: Dict[Tuple, float], random_state: np.random.RandomState
 ) -> List[Set]:
     """
     Given the proper cluster graph, perform Spectral Clustering
@@ -189,7 +191,13 @@ def spectral_cluster_graph(
     Returns:
         List[Set]: A bipartition of the vertices
     """
-    sc = SpectralClustering(2, affinity="precomputed", assign_labels="kmeans", n_jobs=1)
+    sc = SpectralClustering(
+        2,
+        affinity="precomputed",
+        assign_labels="kmeans",
+        n_jobs=1,
+        random_state=random_state,
+    )
 
     # Order vertices
     vertex_list = list(vertices)
