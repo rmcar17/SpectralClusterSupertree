@@ -457,7 +457,7 @@ def _proper_cluster_graph_edges(
     elif pcg_weighting == "depth":
         length_function = lambda length, tree: length + 1
     else:
-        length_function = lambda length, tree: length + tree.length
+        length_function = lambda length, tree: length + getattr(tree, "length", 1)
 
     normalise_length = 0
     for tree, weight in zip(trees, weights):
