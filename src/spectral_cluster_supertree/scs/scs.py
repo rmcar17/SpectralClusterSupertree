@@ -119,20 +119,11 @@ def spectral_cluster_supertree(
                 pcg_weights,
                 taxa_ocurrences,
                 taxa_co_occurrences,
-                trees,
-                weights,
             )
         components = spectral_cluster_graph(pcg_vertices, pcg_weights)
 
     # The child trees corresponding to the components of the graph
     child_trees = []
-
-    # TODO: What if there are more than two components?
-    # Previously I randomly resolved to make bifurcating.
-    # I suppose now it makes more sense to have that as a
-    # post-processing step?
-    # Slightly frustrating since spectral clustering will
-    # always generate two components.
 
     for component in components:
         component = _component_to_names_set(component)
@@ -162,9 +153,6 @@ def spectral_cluster_supertree(
             )
         )
 
-        # It is possible that some tip names are missed (particularly
-        # if inducing would only leave length 1). TODO: think more about when this case
-        # if exhibited
         missing_tips = component.difference(_get_all_tip_names(new_induced_trees))
 
         # In this case, treat these tips as individual subtrees
@@ -194,14 +182,6 @@ def spectral_cluster_graph(
     Given the proper cluster graph, perform Spectral Clustering
     to find the best partition of the vertices.
 
-    TODO: I asked earlier what to do as this always returns
-    a bipartition, though the min-cut method could possibly
-    return an arbitrary partition (every edge on any min-cut)
-    was removed. Could it be possible to access the eigenvector
-    to find vertices that don't neatly belong to either class?
-    Some method with k-means to work out optimal number of classes
-    (probably not because the normal case should be two classes).
-
     Args:
         vertices (Set): The set of vertices
         edge_weights (Dict[FrozenSet, float]): The weights of the edges
@@ -214,16 +194,8 @@ def spectral_cluster_graph(
     # Order vertices
     vertex_list = list(vertices)
 
-    # TODO: Previously I restricted the of the weights of the edges
-    # to be ints, and I used a numpy array with dtype=np.int8 to save
-    # memory. Should I somehow choose whether to use a sparse matrix
-    # or not. Should I move back from now float to int? Is there some
-    # kind of automatic selection that can be performed?
     edges = np.zeros((len(vertex_list), len(vertex_list)))
 
-    # TODO: This is horridly inefficient (well not in practice). Generate
-    # mapping from vertices to indices and iterate over edges instead as
-    # this will likely be semi-sparse
     for i, v1 in enumerate(vertex_list):
         for j, v2 in enumerate(vertex_list):
             edges[i, j] = edge_weights.get(edge_tuple(v1, v2), 0)
@@ -243,8 +215,6 @@ def _contract_proper_cluster_graph(
     edge_weights: Dict[Tuple, float],
     taxa_occurrences: Dict[Tuple, int],
     taxa_co_occurrences: Dict[Tuple, int],
-    trees: Sequence[TreeNode],
-    weights: Sequence[float],
 ) -> None:
     """
     This method operates in-place.
@@ -324,7 +294,6 @@ def _contract_proper_cluster_graph(
                 )
 
                 # There may be multiple edges to a vertex outside of the contraction
-                # TODO: Perhaps don't store in list and have a seperate step later
                 if new_edge_pair not in new_edge_weights:
                     new_edge_weights[new_edge_pair] = []
                 new_edge_weights[new_edge_pair].append(edge_weights[old_edge])
