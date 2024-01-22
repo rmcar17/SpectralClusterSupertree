@@ -14,6 +14,6 @@ __status__ = "alpha"
 
 print("HEllo")
 
-# from spectral_cluster_supertree.scs.scs import spectral_cluster_supertree
+from spectral_cluster_supertree.scs.scs import spectral_cluster_supertree
 
 print("Done")
