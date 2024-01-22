@@ -1,12 +1,15 @@
+print("beginning import")
 import multiprocessing as mp
 from multiprocessing.connection import Connection, wait
 from queue import PriorityQueue, Queue
 import time
+import cogent3
 from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple
 from enum import Enum
 
+print("end import")
+
 taskID = int
-# print("STARTING")
 
 
 class Command(Enum):
@@ -24,13 +27,18 @@ class Task:
     number_of_tasks: taskID = 0
 
     def __init__(
-        self, func: Callable, args: Optional[Sequence], priority: Optional[int] = None
+        self,
+        func: Callable,
+        args: Optional[Sequence],
+        priority: Optional[int] = None,
+        kwargs=None,
     ) -> None:
         self.func = func
         self.args = args
         self.priority = priority
         self.dependent_tasks = set()
         self.task_id = None
+        self.kwargs = kwargs or {}
 
     def distributor_add_dependent_task(self, task: taskID):
         self.dependent_tasks.add(task)
@@ -51,7 +59,7 @@ class Task:
         assert self.task_id is not None
         assert self.args is not None
         # print(self.func, self.args)
-        return TaskResult(self.task_id, self.func(*self.args))
+        return TaskResult(self.task_id, self.func(*self.args, **self.kwargs))
 
     def __str__(self) -> str:
         return (
@@ -64,10 +72,11 @@ class Task:
 
 
 class MergeResultOfTasks:
-    def __init__(self, subtasks: List[Task], merger: Callable) -> None:
+    def __init__(self, subtasks: List[Task], merger: Callable, kwargs=None) -> None:
         self.subtasks = subtasks
         self.merger = merger
         self.subtask_ids: Optional[List[taskID]] = None
+        self.kwargs = kwargs or {}
 
     def get_subtask_ids(self) -> List[taskID]:
         assert self.subtask_ids is not None
@@ -81,7 +90,7 @@ class MergeResultOfTasks:
             self.subtask_ids.append(subtask.task_id)
 
     def distributor_generate_dependent_task(self) -> Task:
-        task = Task(self.merger, None)
+        task = Task(self.merger, None, kwargs=self.kwargs)
         task.distributor_set_task_id()
         assert task.task_id is not None
         for subtask in self.subtasks:
@@ -229,21 +238,32 @@ class TaskDistributor:
 class Worker:
     def __init__(self, work_conn: Connection) -> None:
         self.work_conn = work_conn
-        self.process = mp.Process(target=Worker._worker_run, args=(self.work_conn,))
+        self.process = mp.Process(
+            target=Worker._worker_run, args=(self.work_conn,), daemon=False
+        )
 
     def start(self):
+        print("STARTING PROCESS")
         self.process.start()
+        print("STARTED")
 
     @staticmethod
     def _worker_run(work_conn: Connection):
+        print("WORKER SENDING READY", __name__)
+        from cogent3 import make_tree
+
         work_conn.send(Command.READY)
+        print("WAITING FOR COMMAND")
         work_conn.poll(timeout=None)
         command = work_conn.recv()
         while command != Command.FINISHED:
-            # print(command)
+            print("COMMAND", command)
             assert isinstance(command, Task)
             result = command.execute()
 
             work_conn.send(result)
             work_conn.poll(timeout=None)
             command = work_conn.recv()
+
+
+print("loaded")
