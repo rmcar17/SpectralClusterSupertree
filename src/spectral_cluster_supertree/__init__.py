@@ -12,8 +12,4 @@ __maintainer__ = "Robert McArthur"
 __email__ = "robert.mcarthur@anu.edu.au"
 __status__ = "alpha"
 
-print("HEllo")
-
-from spectral_cluster_supertree.scs.scs import spectral_cluster_supertree
-
-print("Done")
+# from spectral_cluster_supertree.scs.scs import spectral_cluster_supertree
