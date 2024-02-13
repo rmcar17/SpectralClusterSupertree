@@ -3,6 +3,7 @@ Spectral Cluster Supertree
 
 A scalable and accurate algorithm for merging rooted phylogenetic trees.
 """
+
 __author__ = "Robert McArthur"
 __copyright__ = "Copyright 2023, Robert McArthur"
 __credits__ = ["Robert McArthur"]
