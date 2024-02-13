@@ -23,7 +23,7 @@ keywords = [
 license = {file = "LICENSE"}
 name = "spectral_cluster_supertree"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.12"
 # the following are inferred from the source code
 dynamic = ["version", "description"]
 
