@@ -18,5 +18,5 @@ def test(session):
         "-x",
         "--cov-report",
         f"lcov:lcov-{session.python}.info",
-        "--cov"
+        "--cov",
     )
