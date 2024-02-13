@@ -1,19 +1,5 @@
-# some data files
-simulated_trees/aln_data/*.pkl
-
 # vscode
 .vscode
-
-# data
-data/*
-
-# superfine
-superfine/*
-SuperFine/*
-superfine/
-
-# bcd
-bcd/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
