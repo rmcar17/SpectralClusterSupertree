@@ -14,5 +14,9 @@ def test(session):
     session.chdir("tests")
     session.run(
         "pytest",
+        "-s",
         "-x",
+        "--cov-report",
+        f"lcov:lcov-{session.python}.info",
+        "--cov"
     )
