@@ -1,14 +1,10 @@
-from pathlib import Path
-
-
-import pytest
 from cogent3 import make_tree
 from spectral_cluster_supertree import spectral_cluster_supertree
 
 
 def scs_test(in_trees, expected):
     result = spectral_cluster_supertree(in_trees).sorted()
-    assert str(result) == str(expected)
+    assert result.same_shape(expected)
 
 
 def test_agreeable():
