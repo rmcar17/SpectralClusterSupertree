@@ -70,3 +70,14 @@ def test_two_squares_inconsitency():
 
     expected = make_tree("(((a,b),(c,d)),((e,f),(g,h)))")
     scs_test([tree_1, tree_2, tree_3, tree_4, tree_5, tree_6, tree_7, tree_8], expected)
+
+
+def test_simple_contration():
+    """
+    Small problems where contraction is required
+    """
+    tree_1 = make_tree("(((a,b),c),(d,e))")
+    tree_2 = make_tree("((a,b),(c,d))")
+
+    expected = make_tree("(((a,b),c),(d,e))")
+    scs_test([tree_1, tree_2], expected)
