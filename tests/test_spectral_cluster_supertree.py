@@ -33,7 +33,7 @@ def test_simple_inconsistency():
 
     a-b-c-d
 
-    Spectral Clustering Splits over b/c
+    Spectral Clustering splits over b/c
     """
     tree_1 = make_tree("(a,(b,c))")
     tree_2 = make_tree("(b,(c,d))")
@@ -50,6 +50,14 @@ def test_two_squares_inconsitency():
     a-b-e-f
     | | | |
     c-d-g-h
+
+    Spectral Clustering splits over b/e d/g
+
+    Subsequent graphs are
+
+    a-b | e-f
+        |
+    c-d | g-h
     """
     tree_1 = make_tree("((a,b),(c,d))")
     tree_2 = make_tree("((e,f),(g,h))")
@@ -57,6 +65,8 @@ def test_two_squares_inconsitency():
     tree_4 = make_tree("(g,(b,d))")
     tree_5 = make_tree("(a,(e,g))")
     tree_6 = make_tree("(b,(f,h))")
+    tree_7 = make_tree("(a,(b,e))")
+    tree_8 = make_tree("(h,(d,g))")
 
     expected = make_tree("(((a,b),(c,d)),((e,f),(g,h)))")
-    scs_test([tree_1, tree_2, tree_3, tree_4, tree_5, tree_6], expected)
+    scs_test([tree_1, tree_2, tree_3, tree_4, tree_5, tree_6, tree_7, tree_8], expected)
