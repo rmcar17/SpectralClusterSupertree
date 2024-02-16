@@ -13,7 +13,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.10",
 ]
-dependencies = ["click", "scitrack", "numpy ==1.24.4", "cogent3 ==2023.9.22a1", "scikit-learn ==1.2.2"]
+dependencies = ["click", "scitrack", "numpy ==1.24.4", "cogent3 ==2024.2.5a1", "scikit-learn ==1.2.2"]
 keywords = [
   "supertree",
   "phylogeny",
