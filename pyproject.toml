@@ -13,7 +13,7 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.10",
 ]
-dependencies = ["click", "scitrack", "numpy ==1.26.4", "cogent3 ==2024.2.5a1", "scikit-learn ==1.4.0"]
+dependencies = ["click ==8.1.7", "numpy ==1.26.4", "cogent3 ==2024.2.5a1", "scikit-learn ==1.4.0"]
 keywords = [
   "supertree",
   "phylogeny",
@@ -33,11 +33,11 @@ include = ["doc/", "requirements.txt", "src/*", "pyproject.toml"]
 
 [project.optional-dependencies]
 dev = [
-  "black",
-  "click",
+  "black==23.12.1",
+  "isort==5.13.2",
+  "click==8.1.7",
   "docformatter",
   "flit",
-  "isort",
   "pytest",
   "pytest-cov",
   "pytest-xdist",
@@ -65,7 +65,7 @@ exclude = '''
 )/
 '''
 line-length = 88
-target-version = ["py310"]
+target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.isort]
 atomic = true
