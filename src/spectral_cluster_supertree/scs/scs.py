@@ -1,31 +1,3 @@
-"""
-Includes argument to handle branch lenghts
-
-Spectral Cluster Supertree
-
-Link to Original Min-Cut Supertree: https://www.sciencedirect.com/science/article/pii/S0166218X0000202X
-Link to Modified Min-Cut Supertree: https://www.researchgate.net/profile/Roderic-Page/publication/226374714_Modified_Mincut_Supertrees/links/0deec536b8f1011d10000000/Modified-Mincut-Supertrees.pdf
-
-(I appreciate that Original and Modified are of the same length)
-
-Potential dataset http://www.cs.utexas.edu/~phylo/datasets/supertrees.html
-(Use wayback machine)
-Relevant paper: https://academic.oup.com/sysbio/article/63/4/566/2848417?login=false
-
-SMIDGen
-
-https://sites.google.com/eng.ucsd.edu/datasets/dactalsuperfine
-
-Superfine paper:
-https://academic.oup.com/sysbio/article/61/2/214/1645715?login=true
-Parallel Superfine paper:
-https://dl.acm.org/doi/pdf/10.1145/2245276.2231992
-Parallel Superfine paper (different authors): (one shared author rather)
-https://www.sciencedirect.com/science/article/pii/S0167739X16300814 (it also talks about a bunch of other supertree methods)
-
-Finally found superfine https://github.com/dtneves/SuperFine
-"""
-
 from typing import (
     Callable,
     Collection,
