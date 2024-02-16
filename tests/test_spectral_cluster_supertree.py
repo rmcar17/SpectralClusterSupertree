@@ -93,3 +93,5 @@ def test_size_two_trees():
 
     expected = make_tree("(a,b,c,d)")
     scs_test([tree_1, tree_2, tree_3], expected)
+
+    scs_test([tree_1], tree_1)

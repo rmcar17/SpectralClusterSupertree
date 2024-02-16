@@ -59,6 +59,11 @@ def spectral_cluster_supertree(
     # are the names of the tips of all trees
     all_names = _get_all_tip_names(trees)
 
+    # If there are less than or only two names, can instantly return a tree
+    if len(all_names) <= 2:
+        tree = _tip_names_to_tree(all_names)
+        return tree
+
     pcg_vertices = set((name,) for name in all_names)
 
     (
