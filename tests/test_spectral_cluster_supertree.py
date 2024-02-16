@@ -28,9 +28,35 @@ def test_agreeable():
 
 
 def test_simple_inconsistency():
+    """
+    Proper cluster graph shaped:
+
+    a-b-c-d
+
+    Spectral Clustering Splits over b/c
+    """
     tree_1 = make_tree("(a,(b,c))")
     tree_2 = make_tree("(b,(c,d))")
     tree_3 = make_tree("(d,(a,b))")
 
     expected = make_tree("((a,b),(c,d))")
     scs_test([tree_1, tree_2, tree_3], expected)
+
+
+def test_two_squares_inconsitency():
+    """
+    Proper cluster graph shaped:
+
+    a-b-e-f
+    | | | |
+    c-d-g-h
+    """
+    tree_1 = make_tree("((a,b),(c,d))")
+    tree_2 = make_tree("((e,f),(g,h))")
+    tree_3 = make_tree("(e,(a,c))")
+    tree_4 = make_tree("(g,(b,d))")
+    tree_5 = make_tree("(a,(e,g))")
+    tree_6 = make_tree("(b,(f,h))")
+
+    expected = make_tree("(((a,b),(c,d)),((e,f),(g,h)))")
+    scs_test([tree_1, tree_2, tree_3, tree_4, tree_5, tree_6], expected)
