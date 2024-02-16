@@ -81,3 +81,15 @@ def test_simple_contration():
 
     expected = make_tree("(((a,b),c),(d,e))")
     scs_test([tree_1, tree_2], expected)
+
+
+def test_size_two_trees():
+    """
+    Trees with only two leaves. No information gained but a special case nonetheless.
+    """
+    tree_1 = make_tree("(a,b)")
+    tree_2 = make_tree("(b,c)")
+    tree_3 = make_tree("(c,d)")
+
+    expected = make_tree("(a,b,c,d)")
+    scs_test([tree_1, tree_2, tree_3], expected)

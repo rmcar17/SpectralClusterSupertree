@@ -41,7 +41,6 @@ def spectral_cluster_supertree(
     Returns:
         TreeNode: The supertree containing all taxa in the input trees.
     """
-
     assert len(trees) >= 1, "there must be at least one tree"
 
     assert pcg_weighting in ["one", "branch", "depth"]
@@ -59,11 +58,6 @@ def spectral_cluster_supertree(
     # The vertices of the proper cluster graph
     # are the names of the tips of all trees
     all_names = _get_all_tip_names(trees)
-
-    # If there are less than or only two names, can instantly return a tree
-    if len(all_names) <= 2:
-        tree = _tip_names_to_tree(all_names)
-        return tree
 
     pcg_vertices = set((name,) for name in all_names)
 
