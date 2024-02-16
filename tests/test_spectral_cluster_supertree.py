@@ -25,3 +25,12 @@ def test_agreeable():
     expected = make_tree("(((a,(b,(f,g))),(c,(d,e))),((x,y),z))")
 
     scs_test([tree_1, tree_2], expected)
+
+
+def test_simple_inconsistency():
+    tree_1 = make_tree("(a,(b,c))")
+    tree_2 = make_tree("(b,(c,d))")
+    tree_3 = make_tree("(d,(a,b))")
+
+    expected = make_tree("((a,b),(c,d))")
+    scs_test([tree_1, tree_2, tree_3], expected)
