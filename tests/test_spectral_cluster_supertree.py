@@ -1,10 +1,26 @@
-from cogent3 import make_tree
+from pathlib import Path
+import pytest
+from typing import Sequence
+from cogent3 import make_tree, load_tree, TreeNode
 from spectral_cluster_supertree import spectral_cluster_supertree
 
+TEST_DATA_DIR = Path("tests/test_data")
 
-def scs_test(in_trees, expected):
+
+def scs_test(in_trees: Sequence[TreeNode], expected: TreeNode):
     result = spectral_cluster_supertree(in_trees).sorted()
+    expected = expected.sorted()
     assert result.same_shape(expected)
+
+
+def load_model_tree_file(model_tree_file):
+    return load_tree(TEST_DATA_DIR / model_tree_file)
+
+
+def load_source_tree_file(source_tree_file):
+    with open(TEST_DATA_DIR / source_tree_file) as f:
+        source_trees = [make_tree(line.strip()) for line in f]
+    return source_trees
 
 
 def test_agreeable():
@@ -25,6 +41,19 @@ def test_agreeable():
     expected = make_tree("(((a,(b,(f,g))),(c,(d,e))),((x,y),z))")
 
     scs_test([tree_1, tree_2], expected)
+
+
+@pytest.mark.parametrize(
+    "model_tree_file,source_tree_file", [("dcm_model_tree.tre", "dcm_source_trees.tre")]
+)
+def test_dcm_agreeable(model_tree_file, source_tree_file):
+    """
+    An example where DCM decomposition means the model tree can always be reproduced.
+    """
+    model_tree = load_model_tree_file(model_tree_file)
+    source_trees = load_source_tree_file(source_tree_file)
+
+    scs_test(source_trees, model_tree)
 
 
 def test_simple_inconsistency():
