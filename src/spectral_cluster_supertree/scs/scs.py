@@ -15,42 +15,6 @@ from cogent3.core.tree import TreeBuilder, TreeNode, PhyloNode
 from sklearn.cluster import SpectralClustering
 
 
-import os
-import sys
-
-if "win" in sys.platform:
-    print("Hello I'm Windows")
-    if "3.9" in sys.version:
-        print("3.9")
-    if "3.10" in sys.version:
-        print("3.10")
-    if "3.11" in sys.version:
-        print("3.11")
-    if "3.12" in sys.version:
-        print("3.12")
-elif "dar" in sys.platform:
-    print("Hello I'm Mac")
-    if "3.9" in sys.version:
-        print("3.9")
-    if "3.10" in sys.version:
-        print("3.10")
-    if "3.11" in sys.version:
-        print("3.11")
-    if "3.12" in sys.version:
-        print("3.12")
-elif "lin" in sys.platform:
-    print("Hello I'm Linux")
-    if "3.9" in sys.version:
-        print("3.9")
-    if "3.10" in sys.version:
-        print("3.10")
-    if "3.11" in sys.version:
-        print("3.11")
-    if "3.12" in sys.version:
-        print("3.12")
-print(sys.platform)
-
-
 def spectral_cluster_supertree(
     trees: Sequence[TreeNode],
     pcg_weighting: str = "one",
