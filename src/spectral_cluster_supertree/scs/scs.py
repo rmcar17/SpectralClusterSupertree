@@ -216,7 +216,7 @@ def _contract_proper_cluster_graph(
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
     max_vertices = set()
-    max_edges = {}
+    max_edges: dict[tuple, set[tuple]] = {}
     for pair, count in taxa_co_occurrences.items():
         u, v = pair
         max_possible_count = max(taxa_occurrences[u], taxa_occurrences[v])
