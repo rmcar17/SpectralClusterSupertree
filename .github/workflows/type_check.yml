@@ -1,4 +1,4 @@
-name: CI
+name: Type Check
 
 on: [push, pull_request]
 
