@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   tests:
-    name: "Type Checking Python ${{ matrix.python-version }}"
+    name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-latest
 
     strategy:
