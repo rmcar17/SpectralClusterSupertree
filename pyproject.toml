@@ -33,7 +33,7 @@ include = ["doc/", "requirements.txt", "src/*", "pyproject.toml"]
 
 [project.optional-dependencies]
 dev = [
-  "black==23.12.1",
+  "black==24.2.0",
   "isort==5.13.2",
   "click==8.1.7",
   "docformatter",
