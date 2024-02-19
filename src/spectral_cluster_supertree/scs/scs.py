@@ -1,13 +1,9 @@
 from typing import (
     Callable,
     Collection,
-    Dict,
     Iterable,
-    List,
     Optional,
     Sequence,
-    Set,
-    Tuple,
 )
 
 import numpy as np
@@ -141,26 +137,28 @@ def _denamify(tree: TreeNode):
         node.name = None
 
 
-def _component_to_names_set(component: Set[Tuple]) -> Set:
-    names_set = set()
+def _component_to_names_set(component: set[tuple]) -> set:
+    names_set: set[tuple] = set()
     for c in component:
         names_set.update(c)
     return names_set
 
 
 def spectral_cluster_graph(
-    vertices: Set, edge_weights: Dict[Tuple, float], random_state: np.random.RandomState
-) -> List[Set]:
+    vertices: set[tuple],
+    edge_weights: dict[tuple, float],
+    random_state: np.random.RandomState,
+) -> list[set]:
     """
     Given the proper cluster graph, perform Spectral Clustering
     to find the best partition of the vertices.
 
     Args:
-        vertices (Set): The set of vertices
-        edge_weights (Dict[FrozenSet, float]): The weights of the edges
+        vertices (set): The set of vertices
+        edge_weights (dict[Frozenset, float]): The weights of the edges
 
     Returns:
-        List[Set]: A bipartition of the vertices
+        list[set]: A bipartition of the vertices
     """
     sc = SpectralClustering(
         2,
@@ -181,7 +179,7 @@ def spectral_cluster_graph(
 
     idxs = sc.fit_predict(edges)
 
-    partition = [set(), set()]
+    partition: list[set[tuple]] = [set(), set()]
     for vertex, idx in zip(vertex_list, idxs):
         partition[idx].add(vertex)
 
@@ -189,11 +187,11 @@ def spectral_cluster_graph(
 
 
 def _contract_proper_cluster_graph(
-    vertices: Set,
-    edges: Dict,
-    edge_weights: Dict[Tuple, float],
-    taxa_occurrences: Dict[Tuple, int],
-    taxa_co_occurrences: Dict[Tuple, int],
+    vertices: set[tuple],
+    edges: dict[tuple, set[tuple]],
+    edge_weights: dict[tuple, float],
+    taxa_occurrences: dict[tuple, int],
+    taxa_co_occurrences: dict[tuple, int],
 ) -> None:
     """
     This method operates in-place.
@@ -209,16 +207,16 @@ def _contract_proper_cluster_graph(
     that support at least one of those edges.
 
     Args:
-        vertices (Set): The set of vertices
-        edges (Dict): A mapping of vertices to other vertices they connect
-        edge_weights (Dict[FrozenSet, float]): The weight for each edge between two vertices
+        vertices (set): The set of vertices
+        edges (dict): A mapping of vertices to other vertices they connect
+        edge_weights (dict[Frozenset, float]): The weight for each edge between two vertices
         trees (Sequence[TreeNode]): The input trees
         weights (Sequence[float]): The weights of the input trees
     """
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
     max_vertices = set()
-    max_edges = {}
+    max_edges: dict[tuple, set[tuple]] = {}
     for pair, count in taxa_co_occurrences.items():
         u, v = pair
         max_possible_count = max(taxa_occurrences[u], taxa_occurrences[v])
@@ -238,7 +236,7 @@ def _contract_proper_cluster_graph(
     # Find the new vertices in processeded_contractions
     processed_contractions = []
     for contraction in contractions:
-        processed = []
+        processed: list[tuple] = []
         for vertex in contraction:
             processed.extend(vertex)
         processed_contractions.append(tuple_sorted(processed))
@@ -250,7 +248,7 @@ def _contract_proper_cluster_graph(
             vertex_to_contraction[vertex] = new_vertex
 
     # Contract the graph
-    new_edge_weights = {}
+    new_edge_weights: dict[tuple, list[float]] = {}
     for contraction, new_vertex in zip(contractions, processed_contractions):
         # Remove the contraction from the graph
         vertices.difference_update(contraction)
@@ -317,8 +315,8 @@ def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
 
 
 def _generate_induced_trees_with_weights(
-    names: Set, trees: Sequence[TreeNode], weights: Sequence[float]
-) -> Tuple[List[TreeNode], List[float]]:
+    names: set, trees: Sequence[TreeNode], weights: Sequence[float]
+) -> tuple[list[TreeNode], list[float]]:
     """
     Induces the input trees on the set of names.
 
@@ -330,12 +328,12 @@ def _generate_induced_trees_with_weights(
     and a list containing their corresponding weights.
 
     Args:
-        names (Set): The names to induce the trees on
-        trees (List[TreeNode]): The original trees to be induced
-        weights (List[float]): The corresponding weights of the trees
+        names (set): The names to induce the trees on
+        trees (list[TreeNode]): The original trees to be induced
+        weights (list[float]): The corresponding weights of the trees
 
     Returns:
-        Tuple[Sequence[TreeNode], Sequence[float]]: The induced trees and corresponding weights
+        tuple[Sequence[TreeNode], Sequence[float]]: The induced trees and corresponding weights
     """
     induced_trees = []
     new_weights = []
@@ -352,18 +350,20 @@ def _generate_induced_trees_with_weights(
     return induced_trees, new_weights
 
 
-def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
+def _get_graph_components(
+    vertices: set[tuple], edges: dict[tuple, set[tuple]]
+) -> list[set[tuple]]:
     """
     Given a graph expressed as a set of vertices and a dictionary of
     edges (mapping vertices to sets of other vertices), find the
     components of the graph.
 
     Args:
-        vertices (Set): The set of edges.
-        edges (Dict): A mapping of vertices to sets of other vertices.
+        vertices (set): The set of edges.
+        edges (dict): A mapping of vertices to sets of other vertices.
 
     Returns:
-        List[Set]: A list of sets of vertices, each element a component.
+        list[set]: A list of sets of vertices, each element a component.
     """
     components = []
 
@@ -384,14 +384,14 @@ def _get_graph_components(vertices: Set, edges: Dict) -> List[Set]:
 
 
 def _proper_cluster_graph_edges(
-    pcg_vertices: Set,
+    pcg_vertices: set[tuple],
     trees: Sequence[TreeNode],
     weights: Sequence[float],
     pcg_weighting: str,
     normalise_pcg_weights: bool,
     depth_normalisation: bool,
-) -> Tuple[
-    Dict[Tuple, Set[Tuple]], Dict[Tuple, float], Dict[Tuple, int], Dict[Tuple, int]
+) -> tuple[
+    dict[tuple, set[tuple]], dict[tuple, float], dict[tuple, int], dict[tuple, int]
 ]:
     """Constructs a proper cluster graph for a collection of weighted trees.
 
@@ -405,17 +405,17 @@ def _proper_cluster_graph_edges(
     the trees for which the connected vertices are a proper cluster.
 
     Args:
-        pcg_vertices (Set): The names of all leaves in the input trees
+        pcg_vertices (set): The names of all leaves in the input trees
         trees (Sequence[TreeNode]): The trees expressing the proper clusters
         weights (Sequence[float]): The weight of each tree
 
     Returns:
-        Tuple[Dict, Dict[FrozenSet, float]]: The edges and weights of the edges
+        tuple[dict, dict[Frozenset, float]]: The edges and weights of the edges
     """
-    edges = {}
-    edge_weights = {}
-    taxa_occurrences = {}
-    taxa_co_occurrences = {}  # Number of times a taxa appears
+    edges: dict[tuple, set[tuple]] = {}
+    edge_weights: dict[tuple, float] = {}
+    taxa_occurrences: dict[tuple, int] = {}
+    taxa_co_occurrences: dict[tuple, int] = {}  # Number of times a taxa appears
 
     for vertex in pcg_vertices:
         edges[vertex] = set()
@@ -432,7 +432,7 @@ def _proper_cluster_graph_edges(
             1 if tree.length is None else tree.length
         )
 
-    normalise_length = 0
+    normalise_length = 0.0
     for tree, weight in zip(trees, weights):
         depth_normalisation_factor = 1
         if depth_normalisation:
@@ -469,15 +469,15 @@ def _proper_cluster_graph_edges(
 
 
 def dfs_pcg_weights(
-    edges: Dict[Tuple, Set[Tuple]],
-    edge_weights: Dict[Tuple, float],
-    taxa_co_occurrences: Dict[Tuple, float],
+    edges: dict[tuple, set[tuple]],
+    edge_weights: dict[tuple, float],
+    taxa_co_occurrences: dict[tuple, int],
     tree: PhyloNode,
     tree_weight: float,
     length: float,
     length_function: Callable[[float, PhyloNode], float],
     depth_normalisation_factor: int,
-) -> Tuple[List, float]:
+) -> tuple[list, float]:
     if tree.is_tip():
         return [(tree.name,)], 0.0
 
@@ -533,7 +533,7 @@ def tuple_sorted(iterable: Iterable):
     return tuple(sorted(iterable))
 
 
-def _get_all_tip_names(trees: Iterable[TreeNode]) -> Set:
+def _get_all_tip_names(trees: Iterable[TreeNode]) -> set:
     """
     Fetch the tip names for some iterable of input trees.
 
@@ -541,7 +541,7 @@ def _get_all_tip_names(trees: Iterable[TreeNode]) -> Set:
         trees (Iterable[TreeNode]): Input trees.
 
     Returns:
-        Set: A set containing the tip names of the trees.
+        set: A set containing the tip names of the trees.
     """
     names = set()
     for tree in trees:
