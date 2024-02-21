@@ -23,8 +23,6 @@ EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 def spectral_cluster_supertree(
     trees: Sequence[TreeNode],
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
-    normalise_pcg_weights: bool = False,
-    depth_normalisation: bool = False,
     contract_edges: bool = True,
     weights: Sequence[float] | None = None,
     random_state: np.random.RandomState = np.random.RandomState(),
@@ -44,10 +42,6 @@ def spectral_cluster_supertree(
         The trees to find the supertree of.
     pcg_weighting : Literal["one", "branch", "depth"], optional
         The weighting strategy to use, by default "one".
-    normalise_pcg_weights : bool, optional
-        Whether to normalise the weights globally, by default False.
-    depth_normalisation : bool, optional
-        Whether to normalise the weights per tree, by default False.
     contract_edges : bool, optional
         Whether to contract the edges of the proper cluster graph, by default True.
     weights : Sequence[float] | None, optional
@@ -101,8 +95,6 @@ def spectral_cluster_supertree(
         trees,
         weights,
         pcg_weighting,
-        normalise_pcg_weights,
-        depth_normalisation,
     )
 
     components = _get_graph_components(pcg_vertices, pcg_edges)
@@ -143,8 +135,6 @@ def spectral_cluster_supertree(
             spectral_cluster_supertree(
                 new_induced_trees,
                 pcg_weighting,
-                normalise_pcg_weights,
-                depth_normalisation,
                 contract_edges,
                 new_weights,
                 random_state,
@@ -464,8 +454,6 @@ def _proper_cluster_graph_edges(
     trees: Sequence[TreeNode],
     weights: Sequence[float],
     pcg_weighting: Literal["one", "branch", "depth"],
-    normalise_pcg_weights: bool,
-    depth_normalisation: bool,
 ) -> tuple[
     PcgEdgeMap, dict[EdgeTuple, float], dict[PcgVertex, int], dict[EdgeTuple, int]
 ]:
@@ -490,10 +478,6 @@ def _proper_cluster_graph_edges(
         Associated weights of each of the trees.
     pcg_weighting : Literal["one", "branch", "depth"]
         The weighting strategy to use.
-    normalise_pcg_weights : bool
-        Whether the weights of the proper cluster graph should be normalised globally based on longest branch.
-    depth_normalisation : bool
-        Whether the weights of the proper cluster graph should be normalised per tree based on maximum depth.
 
     Returns
     -------
@@ -523,23 +507,9 @@ def _proper_cluster_graph_edges(
             1 if tree.length is None else tree.length
         )
 
-    normalise_length = 0.0
     for tree, weight in zip(trees, weights):
-        depth_normalisation_factor = 1
-        if depth_normalisation:
-            max_length = 0
-            for tip in tree.tips():
-                length = 0
-                while tip.parent is not None:
-                    if hasattr(tip, "length"):
-                        length += getattr(tip, "length")
-                    else:
-                        length += 1
-                    tip = tip.parent
-                max_length = max(max_length, length)
-            depth_normalisation_factor = max_length
         for side in tree:
-            side_taxa, max_sublength = _dfs_pcg_weights(
+            side_taxa = _dfs_pcg_weights(
                 edges,
                 edge_weights,
                 taxa_co_occurrences,
@@ -547,14 +517,9 @@ def _proper_cluster_graph_edges(
                 weight,
                 0,
                 length_function,
-                depth_normalisation_factor,
             )
             for taxa in side_taxa:
                 taxa_occurrences[taxa] += 1
-            normalise_length = max(normalise_length, max_sublength)
-    if normalise_pcg_weights:
-        for edge in edge_weights:
-            edge_weights[edge] /= normalise_length
 
     return edges, edge_weights, taxa_occurrences, taxa_co_occurrences
 
@@ -567,8 +532,7 @@ def _dfs_pcg_weights(
     tree_weight: float,
     length: float,
     length_function: Callable[[float, PhyloNode], float],
-    depth_normalisation_factor: int,
-) -> tuple[list[PcgVertex], float]:
+) -> list[PcgVertex]:
     """Recusrive helper to construct the proper cluster graph from the tree in a DFS fashion.
 
     As all pairs of that are a descendant of an internal but on opposite sides have
@@ -591,25 +555,21 @@ def _dfs_pcg_weights(
         The length from the internal node to the root of the tree.
     length_function : Callable[[float, PhyloNode], float]
         Function which applied the weighting strategy.
-    depth_normalisation_factor : int
-        Normalisation factor.
 
     Returns
     -------
-    tuple[list[PcgVertex], float]
+    list[PcgVertex]
         All descendants of the current node.
-        The maximum root-to-tip distance.
     """
     if tree.is_tip():
         tip_name: Taxa = tree.name  # type: ignore
-        return [(tip_name,)], 0.0
+        return [(tip_name,)]
 
     length = length_function(length, tree)
 
-    max_length = length
     children_tips: list[list[PcgVertex]] = []
     for side in tree:
-        child_tips, normalise_length = _dfs_pcg_weights(
+        child_tips = _dfs_pcg_weights(
             edges,
             edge_weights,
             taxa_co_occurrences,
@@ -617,10 +577,8 @@ def _dfs_pcg_weights(
             tree_weight,
             length,
             length_function,
-            depth_normalisation_factor,
         )
         children_tips.append(child_tips)
-        max_length = max(max_length, normalise_length)
 
     # Add edges to the graph
     for i in range(1, len(children_tips)):
@@ -635,15 +593,14 @@ def _dfs_pcg_weights(
 
                     edge = edge_tuple(taxa_1, taxa_2)
                     edge_weights[edge] = (
-                        edge_weights.get(edge, 0)
-                        + length * tree_weight / depth_normalisation_factor
+                        edge_weights.get(edge, 0) + length * tree_weight
                     )
                     taxa_co_occurrences[edge] = taxa_co_occurrences.get(edge, 0) + 1
 
     for i in range(1, len(children_tips)):
         children_tips[0].extend(children_tips[i])
 
-    return children_tips[0], max_length
+    return children_tips[0]
 
 
 def edge_tuple(v1: PcgVertex, v2: PcgVertex) -> EdgeTuple:
