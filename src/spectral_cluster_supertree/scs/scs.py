@@ -3,7 +3,6 @@ from typing import (
     Collection,
     Iterable,
     Literal,
-    Optional,
     Sequence,
     NewType,
     TypeAlias,
@@ -27,7 +26,7 @@ def spectral_cluster_supertree(
     normalise_pcg_weights: bool = False,
     depth_normalisation: bool = False,
     contract_edges: bool = True,
-    weights: Optional[Sequence[float]] = None,
+    weights: Sequence[float] | None = None,
     random_state: np.random.RandomState = np.random.RandomState(),
 ) -> TreeNode:
     """
