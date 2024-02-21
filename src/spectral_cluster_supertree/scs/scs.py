@@ -1,4 +1,3 @@
-from numbers import Real
 from typing import (
     Callable,
     Collection,
@@ -8,7 +7,6 @@ from typing import (
     Sequence,
     NewType,
     TypeAlias,
-    TypeVar,
 )
 
 import numpy as np
