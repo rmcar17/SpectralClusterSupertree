@@ -16,6 +16,8 @@ from sklearn.cluster import SpectralClustering
 
 Taxa = NewType("Taxa", str)
 PcgVertex: TypeAlias = tuple[Taxa, ...]
+PcgVertexSet: TypeAlias = set[PcgVertex]
+PcgEdgeMap: TypeAlias = dict[PcgVertex, PcgVertexSet]
 EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 
 
@@ -68,7 +70,7 @@ def spectral_cluster_supertree(
         tree = _tip_names_to_tree(all_names)
         return tree
 
-    pcg_vertices: set[PcgVertex] = set((name,) for name in all_names)
+    pcg_vertices: PcgVertexSet = set((name,) for name in all_names)
 
     (
         pcg_edges,
@@ -145,7 +147,7 @@ def _denamify(tree: TreeNode):
         node.name = None
 
 
-def _component_to_names_set(component: set[PcgVertex]) -> set[Taxa]:
+def _component_to_names_set(component: PcgVertexSet) -> set[Taxa]:
     names_set: set[Taxa] = set()
     for c in component:
         names_set.update(c)
@@ -153,10 +155,10 @@ def _component_to_names_set(component: set[PcgVertex]) -> set[Taxa]:
 
 
 def spectral_cluster_graph(
-    vertices: set[PcgVertex],
+    vertices: PcgVertexSet,
     edge_weights: dict[EdgeTuple, float],
     random_state: np.random.RandomState,
-) -> list[set[PcgVertex]]:
+) -> list[PcgVertexSet]:
     """
     Given the proper cluster graph, perform Spectral Clustering
     to find the best partition of the vertices.
@@ -187,7 +189,7 @@ def spectral_cluster_graph(
 
     idxs = sc.fit_predict(edges)
 
-    partition: list[set[PcgVertex]] = [set(), set()]
+    partition: list[PcgVertexSet] = [set(), set()]
     for vertex, idx in zip(vertex_list, idxs):
         partition[idx].add(vertex)
 
@@ -195,8 +197,8 @@ def spectral_cluster_graph(
 
 
 def _contract_proper_cluster_graph(
-    vertices: set[PcgVertex],
-    edges: dict[PcgVertex, set[PcgVertex]],
+    vertices: PcgVertexSet,
+    edges: PcgEdgeMap,
     edge_weights: dict[EdgeTuple, float],
     taxa_occurrences: dict[PcgVertex, int],
     taxa_co_occurrences: dict[EdgeTuple, int],
@@ -223,8 +225,8 @@ def _contract_proper_cluster_graph(
     """
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
-    max_vertices: set[PcgVertex] = set()
-    max_edges: dict[PcgVertex, set[PcgVertex]] = {}
+    max_vertices: PcgVertexSet = set()
+    max_edges: PcgEdgeMap = {}
     for pair, count in taxa_co_occurrences.items():
         u, v = pair
         max_possible_count = max(taxa_occurrences[u], taxa_occurrences[v])
@@ -359,8 +361,8 @@ def _generate_induced_trees_with_weights(
 
 
 def _get_graph_components(
-    vertices: set[PcgVertex], edges: dict[PcgVertex, set[PcgVertex]]
-) -> list[set[PcgVertex]]:
+    vertices: PcgVertexSet, edges: PcgEdgeMap
+) -> list[PcgVertexSet]:
     """
     Given a graph expressed as a set of vertices and a dictionary of
     edges (mapping vertices to sets of other vertices), find the
@@ -373,7 +375,7 @@ def _get_graph_components(
     Returns:
         list[set]: A list of sets of vertices, each element a component.
     """
-    components: list[set[PcgVertex]] = []
+    components: list[PcgVertexSet] = []
 
     unexplored = vertices.copy()
     while unexplored:
@@ -392,14 +394,14 @@ def _get_graph_components(
 
 
 def _proper_cluster_graph_edges(
-    pcg_vertices: set[PcgVertex],
+    pcg_vertices: PcgVertexSet,
     trees: Sequence[TreeNode],
     weights: Sequence[float],
     pcg_weighting: str,
     normalise_pcg_weights: bool,
     depth_normalisation: bool,
 ) -> tuple[
-    dict[PcgVertex, set[PcgVertex]],
+    PcgEdgeMap,
     dict[EdgeTuple, float],
     dict[PcgVertex, int],
     dict[EdgeTuple, int],
@@ -423,7 +425,7 @@ def _proper_cluster_graph_edges(
     Returns:
         tuple[dict, dict[Frozenset, float]]: The edges and weights of the edges
     """
-    edges: dict[PcgVertex, set[PcgVertex]] = {}
+    edges: PcgEdgeMap = {}
     edge_weights: dict[EdgeTuple, float] = {}
     taxa_occurrences: dict[PcgVertex, int] = {}
     taxa_co_occurrences: dict[EdgeTuple, int] = {}  # Number of times a taxa appears
@@ -480,7 +482,7 @@ def _proper_cluster_graph_edges(
 
 
 def dfs_pcg_weights(
-    edges: dict[PcgVertex, set[PcgVertex]],
+    edges: PcgEdgeMap,
     edge_weights: dict[EdgeTuple, float],
     taxa_co_occurrences: dict[EdgeTuple, int],
     tree: PhyloNode,
