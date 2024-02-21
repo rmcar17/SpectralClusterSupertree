@@ -1,7 +1,9 @@
+from numbers import Real
 from typing import (
     Callable,
     Collection,
     Iterable,
+    Literal,
     Optional,
     Sequence,
     NewType,
@@ -23,7 +25,7 @@ EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 
 def spectral_cluster_supertree(
     trees: Sequence[TreeNode],
-    pcg_weighting: str = "one",
+    pcg_weighting: Literal["one", "branch", "depth"] = "one",
     normalise_pcg_weights: bool = False,
     depth_normalisation: bool = False,
     contract_edges: bool = True,
