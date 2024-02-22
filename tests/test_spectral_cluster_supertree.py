@@ -1,37 +1,6 @@
-from pathlib import Path
 import pytest
-from typing import Literal, Sequence
-from cogent3 import make_tree, load_tree, TreeNode
-from spectral_cluster_supertree import spectral_cluster_supertree
-
-TEST_DATA_DIR = Path("tests/test_data")
-
-
-def scs_test(
-    in_trees: Sequence[TreeNode],
-    expected: TreeNode,
-    weights: Sequence[float] | None = None,
-    pcg_weighting: Literal["one", "branch", "depth"] = "one",
-    contract_edges: bool = True,
-):
-    result = spectral_cluster_supertree(
-        in_trees,
-        weights=weights,
-        pcg_weighting=pcg_weighting,
-        contract_edges=contract_edges,
-    ).sorted()
-    expected = expected.sorted()
-    assert result.same_shape(expected), str(result) + " != " + str(expected)
-
-
-def load_model_tree_file(model_tree_file):
-    return load_tree(TEST_DATA_DIR / model_tree_file)
-
-
-def load_source_tree_file(source_tree_file):
-    with open(TEST_DATA_DIR / source_tree_file) as f:
-        source_trees = [make_tree(line.strip()) for line in f]
-    return source_trees
+from helpers import load_expected_tree_file, load_source_tree_file, scs_test
+from cogent3 import make_tree
 
 
 def test_agreeable():
@@ -61,7 +30,7 @@ def test_dcm_agreeable(model_tree_file, source_tree_file):
     """
     An example where DCM decomposition means the model tree can always be reproduced.
     """
-    model_tree = load_model_tree_file(model_tree_file)
+    model_tree = load_expected_tree_file(model_tree_file)
     source_trees = load_source_tree_file(source_tree_file)
 
     scs_test(source_trees, model_tree)
@@ -141,6 +110,9 @@ def test_size_two_trees():
 
 
 def test_simple_weights():
+    """
+    Tests tree weighting works as expected
+    """
     tree_1 = make_tree("(a,(b,c))")
     tree_2 = make_tree("(c,(a,b))")
 
@@ -152,6 +124,9 @@ def test_simple_weights():
 
 
 def test_depth_weighting():
+    """
+    Test that depth pcg weighting works appropriately (branch equivalent when no lengths).
+    """
     tree_1 = make_tree("(a,(b,(c,(d,e))))")
     tree_2 = make_tree("(d,(f,(a,b)))")
 
@@ -168,6 +143,9 @@ def test_depth_weighting():
 
 
 def test_branch_weighting():
+    """
+    Test branch lengths are accounted for appropriately.
+    """
     tree_1 = make_tree("(a:1,(b:1,(c:1,(d:1,e:1):1):1):1)")
     tree_2 = make_tree("(d:0.1,(f:0.1,(a:0.1,b:0.1):0.1):0.1)")
 
