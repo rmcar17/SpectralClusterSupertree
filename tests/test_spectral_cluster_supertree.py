@@ -159,8 +159,16 @@ def test_depth_weighting():
     scs_test([tree_1, tree_2], tree_1, pcg_weighting="one", contract_edges=False)
 
     scs_test(
-        [tree_1, tree_2], expected_depth, pcg_weighting="depth", contract_edges=False
+        [tree_1, tree_2],
+        expected_depth,
+        weights=[1, 100],
+        pcg_weighting="depth",
+        contract_edges=False,
     )
     scs_test(
-        [tree_1, tree_2], expected_depth, pcg_weighting="branch", contract_edges=False
+        [tree_1, tree_2],
+        expected_depth,
+        weights=[1, 100],
+        pcg_weighting="branch",
+        contract_edges=False,
     )
