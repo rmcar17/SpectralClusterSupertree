@@ -24,7 +24,6 @@ def spectral_cluster_supertree(
     trees: Sequence[TreeNode],
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
-    contract_edges: bool = True,
     random_state: np.random.RandomState = np.random.RandomState(),
 ) -> TreeNode:
     """Spectral Cluster Supertree (SCS).
@@ -44,8 +43,6 @@ def spectral_cluster_supertree(
         The weights of the given trees, by default None.
     pcg_weighting : Literal["one", "branch", "depth"], optional
         The weighting strategy to use, by default "one".
-    contract_edges : bool, optional
-        Whether to contract the edges of the proper cluster graph, by default True.
     random_state : np.random.RandomState, optional
         Random number generation to use, by default np.random.RandomState().
 
@@ -100,15 +97,14 @@ def spectral_cluster_supertree(
     components = _get_graph_components(pcg_vertices, pcg_edges)
 
     if len(components) == 1:
-        if contract_edges:
-            # Modifies the proper cluster graph inplace
-            _contract_proper_cluster_graph(
-                pcg_vertices,
-                pcg_edges,
-                pcg_weights,
-                taxa_ocurrences,
-                taxa_co_occurrences,
-            )
+        # Modifies the proper cluster graph inplace
+        _contract_proper_cluster_graph(
+            pcg_vertices,
+            pcg_edges,
+            pcg_weights,
+            taxa_ocurrences,
+            taxa_co_occurrences,
+        )
         components = spectral_cluster_graph(pcg_vertices, pcg_weights, random_state)
 
     # The child trees corresponding to the components of the graph
@@ -136,7 +132,6 @@ def spectral_cluster_supertree(
                 new_induced_trees,
                 new_weights,
                 pcg_weighting,
-                contract_edges,
                 random_state,
             )
         )
