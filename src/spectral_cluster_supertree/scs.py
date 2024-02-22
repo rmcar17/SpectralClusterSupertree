@@ -22,9 +22,9 @@ EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 
 def spectral_cluster_supertree(
     trees: Sequence[TreeNode],
+    weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
     contract_edges: bool = True,
-    weights: Sequence[float] | None = None,
     random_state: np.random.RandomState = np.random.RandomState(),
 ) -> TreeNode:
     """Spectral Cluster Supertree (SCS).
@@ -40,12 +40,12 @@ def spectral_cluster_supertree(
     ----------
     trees : Sequence[TreeNode]
         The trees to find the supertree of.
+    weights : Sequence[float] | None, optional
+        The weights of the given trees, by default None.
     pcg_weighting : Literal["one", "branch", "depth"], optional
         The weighting strategy to use, by default "one".
     contract_edges : bool, optional
         Whether to contract the edges of the proper cluster graph, by default True.
-    weights : Sequence[float] | None, optional
-        The weights of the given trees, by default None.
     random_state : np.random.RandomState, optional
         Random number generation to use, by default np.random.RandomState().
 
@@ -134,9 +134,9 @@ def spectral_cluster_supertree(
         child_trees.append(
             spectral_cluster_supertree(
                 new_induced_trees,
+                new_weights,
                 pcg_weighting,
                 contract_edges,
-                new_weights,
                 random_state,
             )
         )
