@@ -12,6 +12,8 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
 dependencies = ["click ==8.1.7", "numpy ==1.26.4", "cogent3 ==2024.2.5a1", "scikit-learn ==1.4.1.post1"]
 keywords = [
