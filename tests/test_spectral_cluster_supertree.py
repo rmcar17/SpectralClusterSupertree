@@ -1,14 +1,25 @@
 from pathlib import Path
 import pytest
-from typing import Sequence
+from typing import Literal, Sequence
 from cogent3 import make_tree, load_tree, TreeNode
 from spectral_cluster_supertree import spectral_cluster_supertree
 
 TEST_DATA_DIR = Path("tests/test_data")
 
 
-def scs_test(in_trees: Sequence[TreeNode], expected: TreeNode):
-    result = spectral_cluster_supertree(in_trees).sorted()
+def scs_test(
+    in_trees: Sequence[TreeNode],
+    expected: TreeNode,
+    weights: Sequence[float] | None = None,
+    pcg_weighting: Literal["one", "branch", "depth"] = "one",
+    contract_edges: bool = True,
+):
+    result = spectral_cluster_supertree(
+        in_trees,
+        weights=weights,
+        pcg_weighting=pcg_weighting,
+        contract_edges=contract_edges,
+    ).sorted()
     expected = expected.sorted()
     assert result.same_shape(expected)
 
@@ -127,3 +138,14 @@ def test_size_two_trees():
     scs_test([tree_1], tree_1)
     scs_test([tree_1, tree_1], tree_1)
     scs_test([tree_1, tree_4], tree_1)
+
+
+def test_simple_weights():
+    tree_1 = make_tree("(a,(b,c))")
+    tree_2 = make_tree("(c,(a,b))")
+
+    scs_test([tree_1, tree_2], tree_1, weights=[2, 1])
+    scs_test([tree_1, tree_2], tree_1, weights=[1.001, 1])
+
+    scs_test([tree_1, tree_2], tree_2, weights=[1, 2])
+    scs_test([tree_1, tree_2], tree_2, weights=[1, 1.001])
