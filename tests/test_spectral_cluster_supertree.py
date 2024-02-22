@@ -21,7 +21,7 @@ def scs_test(
         contract_edges=contract_edges,
     ).sorted()
     expected = expected.sorted()
-    assert result.same_shape(expected)
+    assert result.same_shape(expected), str(result) + " != " + str(expected)
 
 
 def load_model_tree_file(model_tree_file):
