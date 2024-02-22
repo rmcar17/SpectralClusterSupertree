@@ -165,3 +165,24 @@ def test_depth_weighting():
     scs_test(
         [tree_1, tree_2], expected_depth, pcg_weighting="branch", contract_edges=False
     )
+
+
+def test_branch_weighting():
+    tree_1 = make_tree("(a:1,(b:1,(c:1,(d:1,e:1):1):1):1)")
+    tree_2 = make_tree("(d:0.1,(f:0.1,(a:0.1,b:0.1):0.1):0.1)")
+
+    expected_one_branch = make_tree("((f,a),(b,(c,(d,e))))")
+    expected_depth = make_tree("((f,(a,b)),(c,(d,e)))")
+    scs_test(
+        [tree_1, tree_2], expected_one_branch, pcg_weighting="one", contract_edges=False
+    )
+
+    scs_test(
+        [tree_1, tree_2], expected_depth, pcg_weighting="depth", contract_edges=False
+    )
+    scs_test(
+        [tree_1, tree_2],
+        expected_one_branch,
+        pcg_weighting="branch",
+        contract_edges=False,
+    )
