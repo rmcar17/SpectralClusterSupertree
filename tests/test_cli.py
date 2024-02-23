@@ -10,7 +10,6 @@ from spectral_cluster_supertree.cli import scs
 
 
 def scs_test_cli(
-    tmp_path,
     in_trees: Sequence[TreeNode],
     expected: TreeNode,
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
@@ -18,13 +17,13 @@ def scs_test_cli(
 ):
     runner = CliRunner()
 
-    _, in_file = mkstemp(suffix=".tre", dir=tmp_path)
+    _, in_file = mkstemp(suffix=".tre")
 
     with open(in_file, "w") as f:
         for tree in in_trees:
             f.write(str(tree) + "\n")
 
-    _, out_file = mkstemp(suffix=".tre", dir=tmp_path)
+    _, out_file = mkstemp(suffix=".tre")
 
     args = ["-i", in_file, "-o", out_file, "-p", pcg_weighting]
     if not contract_edges:
@@ -41,7 +40,7 @@ def scs_test_cli(
     assert result.same_shape(expected), str(result) + " != " + str(expected)
 
 
-def test_agreeable(tmp_path):
+def test_agreeable():
     """
     Tests for when spectral clustering is not required.
     """
@@ -51,30 +50,30 @@ def test_agreeable(tmp_path):
 
     expected = make_tree("((a,b),(c,(d,e)))")
 
-    scs_test_cli(tmp_path, [tree_1, tree_2], expected)
+    scs_test_cli([tree_1, tree_2], expected)
 
     tree_1 = make_tree("(((a,b),(c,d)),(z,(x,y)))")
     tree_2 = make_tree("((a,((f,g),b)),(c,(d,e)))")
 
     expected = make_tree("(((a,(b,(f,g))),(c,(d,e))),((x,y),z))")
 
-    scs_test_cli(tmp_path, [tree_1, tree_2], expected)
+    scs_test_cli([tree_1, tree_2], expected)
 
 
 @pytest.mark.parametrize(
     "model_tree_file,source_tree_file", [("dcm_model_tree.tre", "dcm_source_trees.tre")]
 )
-def test_dcm_agreeable(tmp_path, model_tree_file, source_tree_file):
+def test_dcm_agreeable(model_tree_file, source_tree_file):
     """
     An example where DCM decomposition means the model tree can always be reproduced.
     """
     model_tree = load_expected_tree_file(model_tree_file)
     source_trees = load_source_tree_file(source_tree_file)
 
-    scs_test_cli(tmp_path, source_trees, model_tree)
+    scs_test_cli(source_trees, model_tree)
 
 
-def test_simple_inconsistency(tmp_path):
+def test_simple_inconsistency():
     """
     Proper cluster graph shaped:
 
@@ -87,10 +86,10 @@ def test_simple_inconsistency(tmp_path):
     tree_3 = make_tree("(d,(a,b))")
 
     expected = make_tree("((a,b),(c,d))")
-    scs_test_cli(tmp_path, [tree_1, tree_2, tree_3], expected)
+    scs_test_cli([tree_1, tree_2, tree_3], expected)
 
 
-def test_two_squares_inconsitency(tmp_path):
+def test_two_squares_inconsitency():
     """
     Proper cluster graph shaped:
 
@@ -117,13 +116,12 @@ def test_two_squares_inconsitency(tmp_path):
 
     expected = make_tree("(((a,b),(c,d)),((e,f),(g,h)))")
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2, tree_3, tree_4, tree_5, tree_6, tree_7, tree_8],
         expected,
     )
 
 
-def test_simple_contration(tmp_path):
+def test_simple_contration():
     """
     Small problems where contraction is required
     """
@@ -131,10 +129,10 @@ def test_simple_contration(tmp_path):
     tree_2 = make_tree("((a,b),(c,d))")
 
     expected = make_tree("(((a,b),c),(d,e))")
-    scs_test_cli(tmp_path, [tree_1, tree_2], expected)
+    scs_test_cli([tree_1, tree_2], expected)
 
 
-def test_size_two_trees(tmp_path):
+def test_size_two_trees():
     """
     Trees with only two leaves. No information gained but a special case nonetheless.
     """
@@ -144,14 +142,14 @@ def test_size_two_trees(tmp_path):
     tree_4 = make_tree("(b,a)")
 
     expected = make_tree("(a,b,c,d)")
-    scs_test_cli(tmp_path, [tree_1, tree_2, tree_3], expected)
+    scs_test_cli([tree_1, tree_2, tree_3], expected)
 
-    scs_test_cli(tmp_path, [tree_1], tree_1)
-    scs_test_cli(tmp_path, [tree_1, tree_1], tree_1)
-    scs_test_cli(tmp_path, [tree_1, tree_4], tree_1)
+    scs_test_cli([tree_1], tree_1)
+    scs_test_cli([tree_1, tree_1], tree_1)
+    scs_test_cli([tree_1, tree_4], tree_1)
 
 
-def test_depth_weighting(tmp_path):
+def test_depth_weighting():
     """
     Test that depth pcg weighting works appropriately (branch equivalent when no lengths).
     """
@@ -162,7 +160,6 @@ def test_depth_weighting(tmp_path):
     expected_depth = make_tree("((f,(a,b)),(c,(d,e)))")
 
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2],
         expected_one,
         pcg_weighting="one",
@@ -170,14 +167,12 @@ def test_depth_weighting(tmp_path):
     )
 
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2],
         expected_depth,
         pcg_weighting="depth",
         contract_edges=False,
     )
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2],
         expected_depth,
         pcg_weighting="branch",
@@ -185,7 +180,7 @@ def test_depth_weighting(tmp_path):
     )
 
 
-def test_branch_weighting(tmp_path):
+def test_branch_weighting():
     """
     Test branch lengths are accounted for appropriately.
     """
@@ -196,7 +191,6 @@ def test_branch_weighting(tmp_path):
     expected_depth = make_tree("((f,(a,b)),(c,(d,e)))")
 
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2],
         expected_one_branch,
         pcg_weighting="one",
@@ -204,14 +198,12 @@ def test_branch_weighting(tmp_path):
     )
 
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2],
         expected_depth,
         pcg_weighting="depth",
         contract_edges=False,
     )
     scs_test_cli(
-        tmp_path,
         [tree_1, tree_2],
         expected_one_branch,
         pcg_weighting="branch",
@@ -219,8 +211,8 @@ def test_branch_weighting(tmp_path):
     )
 
 
-def test_dcm_iq(tmp_path):
+def test_dcm_iq():
     expected = load_expected_tree_file("dcm_iq_expected.tre")
     source_trees = load_source_tree_file("dcm_iq_source.tre")
 
-    scs_test_cli(tmp_path, source_trees, expected, pcg_weighting="branch")
+    scs_test_cli(source_trees, expected, pcg_weighting="branch")
