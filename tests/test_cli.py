@@ -3,7 +3,7 @@ import pytest
 from helpers import load_expected_tree_file, load_source_tree_file
 from cogent3 import make_tree, TreeNode, load_tree
 from click.testing import CliRunner
-from tempfile import mkstemp
+from tempfile import mktemp
 import os
 
 from spectral_cluster_supertree.cli import scs
@@ -17,13 +17,13 @@ def scs_test_cli(
 ):
     runner = CliRunner()
 
-    _, in_file = mkstemp(suffix=".tre")
+    _, in_file = mktemp(suffix=".tre")
 
     with open(in_file, "w") as f:
         for tree in in_trees:
             f.write(str(tree) + "\n")
 
-    _, out_file = mkstemp(suffix=".tre")
+    _, out_file = mktemp(suffix=".tre")
 
     args = ["-i", in_file, "-o", out_file, "-p", pcg_weighting]
     if not contract_edges:
