@@ -17,13 +17,13 @@ def scs_test_cli(
 ):
     runner = CliRunner()
 
-    _, in_file = mktemp(suffix=".tre")
+    in_file = mktemp(suffix=".tre")
 
     with open(in_file, "w") as f:
         for tree in in_trees:
             f.write(str(tree) + "\n")
 
-    _, out_file = mktemp(suffix=".tre")
+    out_file = mktemp(suffix=".tre")
 
     args = ["-i", in_file, "-o", out_file, "-p", pcg_weighting]
     if not contract_edges:
