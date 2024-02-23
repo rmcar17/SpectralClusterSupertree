@@ -33,6 +33,9 @@ dynamic = ["version", "description"]
 exclude = ["doc/*.html"]
 include = ["doc/", "requirements.txt", "src/*", "pyproject.toml"]
 
+[project.scripts]
+scs = "spectral_cluster_supertree.cli:scs"
+
 [project.optional-dependencies]
 dev = [
   "black==24.2.0",
