@@ -164,3 +164,10 @@ def test_branch_weighting():
         pcg_weighting="branch",
         contract_edges=False,
     )
+
+
+def test_dcm_iq():
+    expected = load_expected_tree_file("dcm_iq_expected.tre")
+    source_trees = load_source_tree_file("dcm_iq_source.tre")
+
+    scs_test(source_trees, expected, pcg_weighting="branch")
