@@ -43,7 +43,3 @@ def scs(
         contract_edges=not disable_contraction,
     )
     supertree.write(out_file, format="newick")
-
-
-if __name__ == "__main__":
-    scs()
