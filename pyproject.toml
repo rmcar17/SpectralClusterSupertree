@@ -34,7 +34,7 @@ exclude = ["doc/*.html"]
 include = ["doc/", "requirements.txt", "src/*", "pyproject.toml"]
 
 [project.scripts]
-scs = "spectral_cluster_supertree.cli:main"
+scs = "spectral_cluster_supertree.cli:scs"
 
 [project.optional-dependencies]
 dev = [

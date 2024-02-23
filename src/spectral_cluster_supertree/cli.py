@@ -21,14 +21,29 @@ def load_trees(source_tree_file: str) -> list[TreeNode]:
     default="branch",
     type=click.Choice(["one", "depth", "branch"], case_sensitive=False),
 )
-def main(in_file: str, out_file: str, pcg_weighting: Literal["one", "depth", "branch"]):
+@click.option(
+    "--disable-contraction",
+    help="Disable edge contraction (not recommended).",
+    default=False,
+    is_flag=True,
+)
+def scs(
+    in_file: str,
+    out_file: str,
+    pcg_weighting: Literal["one", "depth", "branch"],
+    disable_contraction: bool,
+):
     """
     Runs spectral cluster supertree over the given set of source trees.
     """
     source_trees = load_trees(in_file)
-    supertree = spectral_cluster_supertree(source_trees, pcg_weighting=pcg_weighting)
+    supertree = spectral_cluster_supertree(
+        source_trees,
+        pcg_weighting=pcg_weighting,
+        contract_edges=not disable_contraction,
+    )
     supertree.write(out_file, format="newick")
 
 
 if __name__ == "__main__":
-    main()
+    scs()
