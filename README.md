@@ -58,3 +58,5 @@ An example is shown below, without the tree weights the alogrithm would randomly
 >>> print(spectral_cluster_supertree([tree_1, tree_2], weights=[1, 1.5]))
 (c,(b,a));
 ```
+
+Tree weighting can only be used in the python implementation, not the CLI.
