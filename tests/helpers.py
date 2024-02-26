@@ -1,5 +1,7 @@
 from pathlib import Path
+
 from cogent3 import load_tree, make_tree
+
 
 TEST_DATA_DIR = Path("tests/test_data")
 

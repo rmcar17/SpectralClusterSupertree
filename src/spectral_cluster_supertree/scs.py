@@ -3,13 +3,14 @@ from typing import (
     Collection,
     Iterable,
     Literal,
-    Sequence,
     NewType,
+    Sequence,
     TypeAlias,
 )
 
 import numpy as np
-from cogent3.core.tree import TreeBuilder, TreeNode, PhyloNode
+
+from cogent3.core.tree import PhyloNode, TreeBuilder, TreeNode
 from sklearn.cluster import SpectralClustering
 
 

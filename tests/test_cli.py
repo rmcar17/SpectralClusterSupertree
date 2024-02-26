@@ -1,10 +1,13 @@
-from typing import Literal, Sequence
-import pytest
-from helpers import load_expected_tree_file, load_source_tree_file
-from cogent3 import make_tree, TreeNode, load_tree
-from click.testing import CliRunner
-from tempfile import mktemp
 import os
+
+from tempfile import mktemp
+from typing import Literal, Sequence
+
+import pytest
+
+from click.testing import CliRunner
+from cogent3 import TreeNode, load_tree, make_tree
+from helpers import load_expected_tree_file, load_source_tree_file
 
 from spectral_cluster_supertree.cli import scs
 

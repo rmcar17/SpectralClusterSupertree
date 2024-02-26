@@ -1,7 +1,9 @@
-from typing import Sequence, Literal
+from typing import Literal, Sequence
+
 import pytest
+
+from cogent3 import TreeNode, make_tree
 from helpers import load_expected_tree_file, load_source_tree_file
-from cogent3 import make_tree, TreeNode
 
 from spectral_cluster_supertree import spectral_cluster_supertree
 
