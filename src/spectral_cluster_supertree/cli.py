@@ -1,16 +1,10 @@
+from spectral_cluster_supertree import (
+    __version__,
+    load_source_trees,
+    spectral_cluster_supertree,
+)
 from typing import Literal
-
 import click
-
-from cogent3 import TreeNode, make_tree
-
-from spectral_cluster_supertree import __version__, spectral_cluster_supertree
-
-
-def load_trees(source_tree_file: str) -> list[TreeNode]:
-    with open(source_tree_file, "r") as f:
-        source_trees: list[TreeNode] = [make_tree(line.strip()) for line in f]  # type: ignore
-    return source_trees
 
 
 @click.command(no_args_is_help=True)
@@ -39,7 +33,7 @@ def scs(
     """
     Runs spectral cluster supertree over the given set of source trees.
     """
-    source_trees = load_trees(in_file)
+    source_trees = load_source_trees(in_file)
     supertree = spectral_cluster_supertree(
         source_trees,
         pcg_weighting=pcg_weighting,

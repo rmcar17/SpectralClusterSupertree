@@ -14,3 +14,10 @@ __email__ = "robert.mcarthur@anu.edu.au"
 __status__ = "alpha"
 
 from spectral_cluster_supertree.scs import spectral_cluster_supertree
+from cogent3 import make_tree, TreeNode
+
+
+def load_source_trees(source_tree_file: str) -> list[TreeNode]:
+    with open(source_tree_file, "r") as f:
+        source_trees: list[TreeNode] = [make_tree(line.strip()) for line in f]  # type: ignore
+    return source_trees
