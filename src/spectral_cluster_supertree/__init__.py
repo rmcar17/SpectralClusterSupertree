@@ -13,8 +13,9 @@ __maintainer__ = "Robert McArthur"
 __email__ = "robert.mcarthur@anu.edu.au"
 __status__ = "alpha"
 
+from cogent3 import TreeNode, make_tree
+
 from spectral_cluster_supertree.scs import spectral_cluster_supertree
-from cogent3 import make_tree, TreeNode
 
 
 def load_source_trees(source_tree_file: str) -> list[TreeNode]:

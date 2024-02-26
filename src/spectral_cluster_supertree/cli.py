@@ -1,10 +1,12 @@
+from typing import Literal
+
+import click
+
 from spectral_cluster_supertree import (
     __version__,
     load_source_trees,
     spectral_cluster_supertree,
 )
-from typing import Literal
-import click
 
 
 @click.command(no_args_is_help=True)
