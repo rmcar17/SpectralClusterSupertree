@@ -30,6 +30,10 @@ In your environment which has spectral-cluster-supertree installed:
 scs -i SOURCE_TREE_FILE -o SUPERTREE_FILE -p PCG_WEIGHTING_STRATEGY
 ```
 
+The ```-i``` and ```-o``` options for the input and output files are required. 
+
+The ```-p``` *proper cluster graph* weighting strategy option must be one of ```ONE|DEPTH|BRANCH```. It defaults to ```BRANCH``` when not provided (not recommended when some trees are missing branch lenghts - see below).
+
 ## Weighting Strategies
 
 ### Proper Cluster Graph Weighting
