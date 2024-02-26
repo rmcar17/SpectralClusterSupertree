@@ -4,7 +4,7 @@
 
 Spectral Cluster Supertree is a state-of-the-art algorithm for constructing rooted supertrees from collections of rooted source trees.
 
-Spectral Cluster Supertree can be used on Newick formatted trees in Python in conjunction with [cogent3's](https://github.com/cogent3/cogent3) tree objects, or invoked from the command line.
+Spectral Cluster Supertree can be used on Newick formatted trees in Python in conjunction with [cogent3](https://github.com/cogent3/cogent3)'s tree objects, or invoked from the command line.
 
 Spectral Cluster Supertree can employ a number of weighting strategies that take into account the depths of nodes in the trees, as well as branch lengths. A user can specify weights of trees to add bias to some of the source trees if desired.
 
