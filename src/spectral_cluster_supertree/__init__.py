@@ -4,11 +4,12 @@ Spectral Cluster Supertree
 A scalable and accurate algorithm for merging rooted phylogenetic trees.
 """
 
+__all__ = ["load_source_trees", "spectral_cluster_supertree"]
 __author__ = "Robert McArthur"
-__copyright__ = "Copyright 2023, Robert McArthur"
+__copyright__ = "Copyright 2024, Robert McArthur"
 __credits__ = ["Robert McArthur"]
 __license__ = "BSD"
-__version__ = "2023.10.30"  # A DATE BASED VERSION
+__version__ = "2024.02.26"
 __maintainer__ = "Robert McArthur"
 __email__ = "robert.mcarthur@anu.edu.au"
 __status__ = "alpha"

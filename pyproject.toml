@@ -30,8 +30,7 @@ requires-python = ">=3.10,<3.13"
 dynamic = ["version", "description"]
 
 [project.sdist]
-exclude = ["doc/*.html"]
-include = ["doc/", "requirements.txt", "src/*", "pyproject.toml"]
+include = ["src/*", "pyproject.toml"]
 
 [project.scripts]
 scs = "spectral_cluster_supertree.cli:scs"
