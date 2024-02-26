@@ -1,7 +1,10 @@
-from cogent3 import TreeNode, make_tree
-from spectral_cluster_supertree import __version__, spectral_cluster_supertree
 from typing import Literal
+
 import click
+
+from cogent3 import TreeNode, make_tree
+
+from spectral_cluster_supertree import __version__, spectral_cluster_supertree
 
 
 def load_trees(source_tree_file: str) -> list[TreeNode]:
