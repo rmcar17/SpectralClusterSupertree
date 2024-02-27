@@ -3,7 +3,7 @@ build-backend = "flit_core.buildapi"
 requires = ["flit_core >=3.4"]
 
 [project]
-authors = [{name = "Robert McArthur", email = "robert.mcarthur@anu.edu.au"}]
+authors = [{name = "Robert McArthur"}]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",

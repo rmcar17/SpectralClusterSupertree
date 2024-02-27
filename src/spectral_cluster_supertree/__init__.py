@@ -11,7 +11,6 @@ __credits__ = ["Robert McArthur"]
 __license__ = "BSD"
 __version__ = "2024.02.26"
 __maintainer__ = "Robert McArthur"
-__email__ = "robert.mcarthur@anu.edu.au"
 __status__ = "Production"
 
 from cogent3 import TreeNode, make_tree
