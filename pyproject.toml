@@ -29,6 +29,10 @@ requires-python = ">=3.10,<3.13"
 # the following are inferred from the source code
 dynamic = ["version", "description"]
 
+[project.urls]
+"Bug Tracker" = "https://github.com/rmcar17/SpectralClusterSupertree/issues"
+"Source Code" = "https://github.com/rmcar17/SpectralClusterSupertree"
+
 [project.sdist]
 include = ["src/*", "pyproject.toml"]
 
