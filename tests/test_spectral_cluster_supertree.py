@@ -5,7 +5,7 @@ import pytest
 from cogent3 import TreeNode, make_tree
 from helpers import load_expected_tree_file, load_source_tree_file
 
-from sc_supertree import spectral_cluster_supertree
+from sc_supertree import construct_supertree
 
 
 def scs_test(
@@ -15,7 +15,7 @@ def scs_test(
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
     contract_edges: bool = True,
 ):
-    result = spectral_cluster_supertree(
+    result = construct_supertree(
         in_trees,
         weights=weights,
         pcg_weighting=pcg_weighting,

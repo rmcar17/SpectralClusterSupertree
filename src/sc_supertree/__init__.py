@@ -4,7 +4,7 @@ Spectral Cluster Supertree
 A scalable and accurate algorithm for merging rooted phylogenetic trees.
 """
 
-__all__ = ["load_source_trees", "spectral_cluster_supertree"]
+__all__ = ["load_source_trees", "construct_supertree"]
 __author__ = "Robert McArthur"
 __copyright__ = "Copyright 2024, Robert McArthur"
 __credits__ = ["Robert McArthur"]
@@ -17,7 +17,7 @@ import os
 
 from cogent3 import TreeNode, make_tree
 
-from sc_supertree.scs import spectral_cluster_supertree
+from sc_supertree.scs import construct_supertree
 
 
 def load_source_trees(source_tree_file: str | bytes | os.PathLike) -> list[TreeNode]:

@@ -21,7 +21,7 @@ PcgEdgeMap: TypeAlias = dict[PcgVertex, PcgVertexSet]
 EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 
 
-def spectral_cluster_supertree(
+def construct_supertree(
     trees: Sequence[TreeNode],
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
@@ -133,7 +133,7 @@ def spectral_cluster_supertree(
 
         # Find the supertree for the induced trees
         child_trees.append(
-            spectral_cluster_supertree(
+            construct_supertree(
                 new_induced_trees,
                 new_weights,
                 pcg_weighting,
