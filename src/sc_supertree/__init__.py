@@ -9,7 +9,7 @@ __author__ = "Robert McArthur"
 __copyright__ = "Copyright 2024, Robert McArthur"
 __credits__ = ["Robert McArthur"]
 __license__ = "BSD"
-__version__ = "2024.02.26"
+__version__ = "2024.2.28"
 __maintainer__ = "Robert McArthur"
 __status__ = "Production"
 
