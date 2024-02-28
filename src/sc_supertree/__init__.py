@@ -5,7 +5,7 @@ A scalable and accurate algorithm for merging rooted phylogenetic trees.
 """
 
 __all__ = ["load_trees", "construct_supertree"]
-__copyright__ = "Copyright 2024, Robert McArthur"
+__copyright__ = "Copyright 2023, Robert McArthur"
 __license__ = "BSD"
 __version__ = "2024.2.28"
 
