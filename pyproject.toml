@@ -23,7 +23,7 @@ keywords = [
   "bioinformatics",
 ]
 license = {file = "LICENSE"}
-name = "sc_supertree"
+name = "sc-supertree"
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 # the following are inferred from the source code
@@ -50,6 +50,9 @@ dev = [
   "nox",
 ]
 test = ["pytest", "pytest-cov", "pytest-xdist", "nox"]
+
+[tool.flit.module]
+name = "sc_supertree"
 
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "-ra"]
