@@ -4,7 +4,7 @@ import click
 
 from sc_supertree import (
     __version__,
-    load_source_trees,
+    load_trees,
     construct_supertree,
 )
 
@@ -35,7 +35,7 @@ def scs(
     """
     Runs spectral cluster supertree over the given set of source trees.
     """
-    source_trees = load_source_trees(in_file)
+    source_trees = load_trees(in_file)
     supertree = construct_supertree(
         source_trees,
         pcg_weighting=pcg_weighting,

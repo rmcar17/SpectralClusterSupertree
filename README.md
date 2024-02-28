@@ -13,9 +13,9 @@ Spectral Cluster Supertree can employ a number of weighting strategies that take
 ### Python
 
 ```python
-from sc_supertree import load_source_trees, construct_supertree
+from sc_supertree import load_trees, construct_supertree
 
-source_trees = load_source_trees("source_tree_file.tre")
+source_trees = load_trees("source_tree_file.tre")
 
 supertree = construct_supertree(source_trees, pcg_weighting="branch")
 
