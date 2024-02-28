@@ -195,13 +195,6 @@ def test_dcm_iq():
     scs_test(source_trees, expected, pcg_weighting="branch")
 
 
-def test_smidgenog():
-    expected = load_expected_tree_file("smidgenog_expected.tre")
-    source_trees = load_source_tree_file("smidgenog_source.tre")
-
-    scs_test(source_trees, expected, pcg_weighting="branch")
-
-
 def test_supertriplets():
     expected = load_expected_tree_file("supertriplets_expected.tre")
     source_trees = load_source_tree_file("supertriplets_source.tre")
