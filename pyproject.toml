@@ -33,9 +33,6 @@ dynamic = ["version", "description"]
 "Bug Tracker" = "https://github.com/rmcar17/SpectralClusterSupertree/issues"
 "Source Code" = "https://github.com/rmcar17/SpectralClusterSupertree"
 
-[project.sdist]
-include = ["src/*", "pyproject.toml"]
-
 [project.scripts]
 scs = "sc_supertree.cli:scs"
 
