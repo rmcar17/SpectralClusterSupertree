@@ -2,11 +2,7 @@ from typing import Literal
 
 import click
 
-from sc_supertree import (
-    __version__,
-    load_trees,
-    construct_supertree,
-)
+from sc_supertree import __version__, construct_supertree, load_trees
 
 
 @click.command(no_args_is_help=True)
