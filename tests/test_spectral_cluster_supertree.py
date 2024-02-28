@@ -5,7 +5,7 @@ import pytest
 from cogent3 import TreeNode, make_tree
 from helpers import load_expected_tree_file, load_source_tree_file
 
-from spectral_cluster_supertree import spectral_cluster_supertree
+from sc_supertree import spectral_cluster_supertree
 
 
 def scs_test(

@@ -23,7 +23,7 @@ keywords = [
   "bioinformatics",
 ]
 license = {file = "LICENSE"}
-name = "spectral_cluster_supertree"
+name = "sc_supertree"
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 # the following are inferred from the source code
@@ -37,7 +37,7 @@ dynamic = ["version", "description"]
 include = ["src/*", "pyproject.toml"]
 
 [project.scripts]
-scs = "spectral_cluster_supertree.cli:scs"
+scs = "sc_supertree.cli:scs"
 
 [project.optional-dependencies]
 dev = [

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from cogent3 import load_tree
 
-from spectral_cluster_supertree import load_source_trees
+from sc_supertree import load_source_trees
 
 
 TEST_DATA_DIR = Path("tests/test_data")

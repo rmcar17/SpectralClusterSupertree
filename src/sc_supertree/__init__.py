@@ -17,7 +17,7 @@ import os
 
 from cogent3 import TreeNode, make_tree
 
-from spectral_cluster_supertree.scs import spectral_cluster_supertree
+from sc_supertree.scs import spectral_cluster_supertree
 
 
 def load_source_trees(source_tree_file: str | bytes | os.PathLike) -> list[TreeNode]:

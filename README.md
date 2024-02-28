@@ -13,7 +13,7 @@ Spectral Cluster Supertree can employ a number of weighting strategies that take
 ### Python
 
 ```python
-from spectral_cluster_supertree import load_source_trees, spectral_cluster_supertree
+from sc_supertree import load_source_trees, spectral_cluster_supertree
 
 source_trees = load_source_trees("source_tree_file.tre")
 
@@ -55,7 +55,7 @@ In addition to the above, users may associate trees with weights to bias the res
 An example is shown below, without the tree weights the alogrithm would randomly return either triple.
 
 ```python
->>> from spectral_cluster_supertree import spectral_cluster_supertree
+>>> from sc_supertree import spectral_cluster_supertree
 >>> from cogent3 import make_tree
 >>> tree_1 = make_tree("(a,(b,c))")
 >>> tree_2 = make_tree("(c,(b,a))")
