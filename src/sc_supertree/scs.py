@@ -89,7 +89,7 @@ def construct_supertree(
     (
         pcg_edges,
         pcg_weights,
-        taxa_ocurrences,
+        taxa_occurrences,
         taxa_co_occurrences,
     ) = _proper_cluster_graph_edges(
         pcg_vertices,
@@ -107,7 +107,7 @@ def construct_supertree(
                 pcg_vertices,
                 pcg_edges,
                 pcg_weights,
-                taxa_ocurrences,
+                taxa_occurrences,
                 taxa_co_occurrences,
             )
         components = spectral_cluster_graph(pcg_vertices, pcg_weights, random_state)
@@ -123,7 +123,7 @@ def construct_supertree(
             child_trees.append(_tip_names_to_tree(component))
             continue
 
-        # Otherwise, need to induce the trees on each compoment
+        # Otherwise, need to induce the trees on each component
         # and recursively call SCS
 
         # Note, inducing could possible remove trees.
@@ -205,7 +205,7 @@ def spectral_cluster_graph(
     Returns
     -------
     list[PcgVertexSet]
-        The bipartion of taxa of the proper cluster graph.
+        The bipartition of taxa of the proper cluster graph.
     """
     sc = SpectralClustering(
         2,
@@ -245,7 +245,7 @@ def _contract_proper_cluster_graph(
     This method operates in-place.
 
     Given the proper cluster graph, contract every edge where
-    two taxa always appear together. i.e. the number of co-occurences
+    two taxa always appear together. i.e. the number of co-occurrences
     as a proper cluster is equal to the maximum number of times either
     taxa appears in any of the source trees.
 
@@ -289,7 +289,7 @@ def _contract_proper_cluster_graph(
     # The components of the new graph are the new vertices after contraction
     contractions = _get_graph_components(max_vertices, max_edges)
 
-    # Find the new vertices in processeded_contractions
+    # Find the new vertices in processed_contractions
     processed_contractions: list[PcgVertex] = []
     for contraction in contractions:
         processed: list[Taxa] = []
@@ -331,7 +331,7 @@ def _contract_proper_cluster_graph(
                     new_edge_weights[new_edge_pair] = []
                 new_edge_weights[new_edge_pair].append(edge_weights[old_edge])
 
-                # Delete the edge and edge weight with the neighbout
+                # Delete the edge and edge weight with the neighbour
                 edges[neighbour].remove(vertex)
                 del edge_weights[old_edge]
             # Handled all neighbours of the vertex,
@@ -534,10 +534,10 @@ def _dfs_pcg_weights(
     length: float,
     length_function: Callable[[float, PhyloNode], float],
 ) -> list[PcgVertex]:
-    """Recusrive helper to construct the proper cluster graph from the tree in a DFS fashion.
+    """Recursive helper to construct the proper cluster graph from the tree in a DFS fashion.
 
     As all pairs of that are a descendant of an internal but on opposite sides have
-    the same wait, performing a DFS minimisises computational cost of constructing
+    the same wait, performing a DFS minimises computational cost of constructing
     the proper cluster graph.
 
     Parameters
