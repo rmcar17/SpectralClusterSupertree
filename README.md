@@ -36,7 +36,7 @@ supertree.write("supertree_file.tre")
 
 ### CLI
 
-In your environment which has spectral-cluster-supertree installed:
+In your environment which has `sc-supertree` installed:
 
 ```bash
 scs -i SOURCE_TREE_FILE -o SUPERTREE_FILE -p PCG_WEIGHTING_STRATEGY
@@ -44,27 +44,27 @@ scs -i SOURCE_TREE_FILE -o SUPERTREE_FILE -p PCG_WEIGHTING_STRATEGY
 
 The ```-i``` and ```-o``` options for the input and output files are required.
 
-The ```-p``` *proper cluster graph* weighting strategy option must be one of ```ONE|DEPTH|BRANCH```. It defaults to ```BRANCH``` when not provided (not recommended when some trees are missing branch lenghts - see below).
+The ```-p``` *proper cluster graph* weighting strategy option must be one of ```ONE|DEPTH|BRANCH```. It defaults to ```BRANCH``` when not provided (not recommended when some trees are missing branch lengths - see below). Tree weights are not supported through the command line.
 
 ## Weighting Strategies
 
 ### Proper Cluster Graph Weighting
 
-Spectral Cluster Supertree recursively paritions the complete set of taxa to form a supertree. The core component of the algorithm involves partitioning the *proper cluster graph* through spectral clustering when the source trees are not consistent.
+Spectral Cluster Supertree recursively partitions the complete set of taxa to form a supertree. The core component of the algorithm involves partitioning the *proper cluster graph* through spectral clustering when the source trees are not consistent.
 
 The *proper cluster graph* has the set of all taxa in the source trees as its vertices, and an edge connects two taxa if they appear together on the same side of the root in any of the source trees (such pairs of taxa are called **proper clusters**). Let $lca$ be the lowest common ancestor of a proper cluster. Each edge is weighted according to the specified strategy:
 
 - **one** - The number of trees in which the pair of taxa appear as a proper cluster in.
 - **depth** - The sum of the depths of the $lca$ of the proper cluster in all of the source trees.
-- **branch** - The sum of the root to $lca$ branch lengths of the proper cluster in all of the source trees. If branch lengths are missing defaults to one (equivalent to depth). Do not use if some trees are missing branch lengths.
+- **branch** - The sum of the root to $lca$ branch lengths of the proper cluster in all of the source trees. If branch lengths are missing defaults to one (equivalent to depth). Do not use if source trees contain a mix of some trees with branch lengths and some without.
 
-The **branch** weighting strategy is recommened where branch lengths are available. Otherwise, the **depth** weighting strategy is recommended over the **one** weighting strategy.
+The **branch** weighting strategy is recommended when branch lengths are available. Otherwise, the **depth** weighting strategy is recommended over the **one** weighting strategy.
 
 ### Tree Weighting
 
-In addition to the above, users may associate trees with weights to bias the results towards specific trees. Prior to the summation of the weights for an edge in the *proper cluster graph*, they are multiplied by the weight of the corresponding tree. The weight of each tree defaults to one if not specified.
+In addition to the above, users may associate trees with weights to bias the results towards specific trees. Prior to the summation of the weights for an edge in the *proper cluster graph*, they are each multiplied by the weight of the corresponding tree. The weight of each tree defaults to one if not specified.
 
-An example is shown below, without the tree weights the alogrithm would randomly return either triple.
+An example is shown below, without the tree weights the algorithm would randomly return either triple.
 
 ```python
 >>> from sc_supertree import construct_supertree
