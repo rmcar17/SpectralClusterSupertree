@@ -7,6 +7,7 @@
 [![CI](https://github.com/rmcar17/SpectralClusterSupertree/workflows/CI/badge.svg)](https://github.com/rmcar17/SpectralClusterSupertree/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/rmcar17/SpectralClusterSupertree/badge.svg?branch=main)](https://coveralls.io/github/rmcar17/SpectralClusterSupertree?branch=main)
 [![License](https://img.shields.io/github/license/rmcar17/SpectralClusterSupertree)](https://github.com/rmcar17/SpectralClusterSupertree/blob/main/LICENSE)
+[![DOI](https://zenodo.org/badge/667189656.svg)](https://zenodo.org/badge/latestdoi/667189656)
 
 Spectral Cluster Supertree is a state-of-the-art algorithm for constructing rooted supertrees from collections of rooted source trees.
 
