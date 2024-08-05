@@ -38,7 +38,7 @@ scs = "sc_supertree.cli:scs"
 
 [project.optional-dependencies]
 dev = [
-  "black==24.4.2",
+  "black==24.8.0",
   "isort==5.13.2",
   "click==8.1.7",
   "mypy==1.11.1",
