@@ -39,7 +39,7 @@ scs = "sc_supertree.cli:scs"
 [project.optional-dependencies]
 dev = [
   "black==24.10.0",
-  "isort==5.13.2",
+  "isort==6.0.0",
   "click==8.1.8",
   "mypy==1.15.0",
   "docformatter",
