@@ -41,7 +41,7 @@ dev = [
   "black==24.10.0",
   "isort==5.13.2",
   "click==8.1.8",
-  "mypy==1.14.1",
+  "mypy==1.15.0",
   "docformatter",
   "flit",
   "pytest",
