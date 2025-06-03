@@ -61,15 +61,24 @@ def construct_supertree(
     if random_state is None:
         random_state = np.random.RandomState()
 
-    assert len(trees) >= 1, "there must be at least one tree"
+    if len(trees) == 0:
+        msg = "There must be at least one tree to make a supertree."
+        raise ValueError(msg)
 
-    assert pcg_weighting in ["one", "branch", "depth", "bootstrap"]
+    if pcg_weighting not in ("one", "branch", "depth", "bootstrap"):
+        msg = f"Invalid weighting strategy selected: '{pcg_weighting}'"
+        raise ValueError(msg)
 
     # Input trees are of equal weight if none is specified
     if weights is None:
         weights = [1.0 for _ in range(len(trees))]
 
-    assert len(trees) == len(weights), "trees and weights must be of same length"
+    if len(trees) != len(weights):
+        msg = (
+            f"The number of trees ({len(trees)}) "
+            f"and tree weights ({len(weights)}) must match."
+        )
+        raise ValueError(msg)
 
     if len(trees) == 1:  # If there is only one tree left, we can simply graft it on
         _denamify(trees[0])
@@ -520,7 +529,9 @@ def _proper_cluster_graph_edges(
         edges[vertex] = set()
         taxa_occurrences[vertex] = 0
 
-    assert pcg_weighting in ["one", "branch", "depth", "bootstrap"]
+    if pcg_weighting not in ("one", "branch", "depth", "bootstrap"):
+        msg = f"Invalid weighting strategy selected: '{pcg_weighting}'"
+        raise ValueError(msg)
 
     if pcg_weighting == "one":
         length_function = lambda length, tree: 1  # noqa: E731
