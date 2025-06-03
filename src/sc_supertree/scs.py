@@ -513,7 +513,12 @@ def _proper_cluster_graph_edges(
 
     Returns
     -------
-    tuple[PcgEdgeMap, dict[EdgeTuple, float], dict[PcgVertex, int], dict[EdgeTuple, int]]
+    tuple[
+        PcgEdgeMap,
+        dict[EdgeTuple, float],
+        dict[PcgVertex, int],
+        dict[EdgeTuple, int],
+    ]
         The edges of the proper cluster graph.
         The weights of the edges of the proper cluster graph.
         The number of times each taxon appears in any of the input trees.
@@ -573,7 +578,7 @@ def _dfs_pcg_weights(
     length: float,
     length_function: Callable[[float, PhyloNode], float],
 ) -> list[PcgVertex]:
-    """Recursive helper to construct the proper cluster graph from the tree in a DFS fashion.
+    """Recursive helper to construct the PCG from the tree in a DFS fashion.
 
     As all pairs of that are a descendant of an internal but on opposite sides have
     the same wait, performing a DFS minimises computational cost of constructing
