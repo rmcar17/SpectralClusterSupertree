@@ -46,7 +46,8 @@ dev = [
   "pytest",
   "pytest-cov",
   "pytest-xdist",
-  "nox"
+  "nox",
+  "attrs>=24.1.0"
 ]
 test = ["pytest", "pytest-cov", "pytest-xdist", "nox"]
 
