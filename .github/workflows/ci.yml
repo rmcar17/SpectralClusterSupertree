@@ -63,6 +63,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+          
+      - uses: "actions/setup-python@v5"
+        with:
+            python-version: "${{ matrix.python-version }}"
       
       - name: "Run Type Checking for ${{ matrix.python-version }}" 
         run: |
@@ -82,6 +87,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - uses: "actions/setup-python@v5"
+        with:
+            python-version: "${{ matrix.python-version }}"
       
       - name: "Run Linting for ${{ matrix.python-version }}" 
         run: |
