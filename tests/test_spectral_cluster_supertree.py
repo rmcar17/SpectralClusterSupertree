@@ -12,7 +12,7 @@ def scs_test(
     in_trees: Sequence[TreeNode],
     expected: TreeNode,
     weights: Sequence[float] | None = None,
-    pcg_weighting: Literal["one", "branch", "depth"] = "one",
+    pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,
     contract_edges: bool = True,
 ) -> None:
@@ -157,8 +157,13 @@ def test_depth_weighting() -> None:
 
     expected_one = make_tree("((f,a),(b,(c,(d,e))))")
     expected_depth = make_tree("((f,(a,b)),(c,(d,e)))")
-    scs_test([tree_1, tree_2], expected_one, pcg_weighting="one", contract_edges=False)
 
+    scs_test(
+        [tree_1, tree_2],
+        expected_one,
+        pcg_weighting="one",
+        contract_edges=False,
+    )
     scs_test(
         [tree_1, tree_2],
         expected_depth,
@@ -182,13 +187,13 @@ def test_branch_weighting() -> None:
 
     expected_one_branch = make_tree("((f,a),(b,(c,(d,e))))")
     expected_depth = make_tree("((f,(a,b)),(c,(d,e)))")
+
     scs_test(
         [tree_1, tree_2],
         expected_one_branch,
         pcg_weighting="one",
         contract_edges=False,
     )
-
     scs_test(
         [tree_1, tree_2],
         expected_depth,
@@ -199,6 +204,38 @@ def test_branch_weighting() -> None:
         [tree_1, tree_2],
         expected_one_branch,
         pcg_weighting="branch",
+        contract_edges=False,
+    )
+
+
+def test_bootstrap() -> None:
+    """
+    Test that bootstrap pcg weighting works appropriately
+    (branch equivalent when no lengths).
+    """
+    tree_1 = make_tree("(a,(b,(c,(d,e)100)100)100)")
+    tree_2 = make_tree("(a,(b,(d,(c,e)45)100)100)100")
+    tree_3 = make_tree("(a,(b,(d,(c,e)50)100)100)100")
+
+    expected_one_depth = make_tree("(a,(b,(d,(c,e))))")
+    expected_bootstrap = make_tree("(a,(b,(c,(d,e))))")
+
+    scs_test(
+        [tree_1, tree_2, tree_3],
+        expected_one_depth,
+        pcg_weighting="one",
+        contract_edges=False,
+    )
+    scs_test(
+        [tree_1, tree_2, tree_3],
+        expected_one_depth,
+        pcg_weighting="depth",
+        contract_edges=False,
+    )
+    scs_test(
+        [tree_1, tree_2, tree_3],
+        expected_bootstrap,
+        pcg_weighting="bootstrap",
         contract_edges=False,
     )
 

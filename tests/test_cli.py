@@ -14,7 +14,7 @@ from sc_supertree.cli import scs
 def scs_test_cli(
     in_trees: Sequence[TreeNode],
     expected: TreeNode,
-    pcg_weighting: Literal["one", "branch", "depth"] = "one",
+    pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,
     contract_edges: bool = True,
 ) -> None:
@@ -176,7 +176,6 @@ def test_depth_weighting() -> None:
         pcg_weighting="one",
         contract_edges=False,
     )
-
     scs_test_cli(
         [tree_1, tree_2],
         expected_depth,
@@ -207,7 +206,6 @@ def test_branch_weighting() -> None:
         pcg_weighting="one",
         contract_edges=False,
     )
-
     scs_test_cli(
         [tree_1, tree_2],
         expected_depth,
