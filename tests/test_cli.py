@@ -33,7 +33,7 @@ def scs_test_cli(
         out_file_path = Path(out_file.name)
 
     try:
-        args = ["-i", in_file_path, "-o", out_file_path, "-p", pcg_weighting]
+        args = ["-i", str(in_file_path), "-o", str(out_file_path), "-p", pcg_weighting]
         if not contract_edges:
             args.append("--disable-contraction")
 
