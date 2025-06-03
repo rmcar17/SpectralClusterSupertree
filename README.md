@@ -45,7 +45,7 @@ scs -i SOURCE_TREE_FILE -o SUPERTREE_FILE -p PCG_WEIGHTING_STRATEGY
 
 The ```-i``` and ```-o``` options for the input and output files are required.
 
-The ```-p``` *proper cluster graph* weighting strategy option must be one of ```ONE|DEPTH|BRANCH```. It defaults to ```BRANCH``` when not provided (not recommended when some trees are missing branch lengths - see below). Tree weights are not supported through the command line.
+The ```-p``` *proper cluster graph* weighting strategy option must be one of ```ONE|DEPTH|BRANCH|BOOTSTRAP```. It defaults to ```BRANCH``` when not provided (not recommended when some trees are missing branch lengths - see below). Tree weights are not supported through the command line.
 
 ## Weighting Strategies
 
@@ -58,8 +58,9 @@ The *proper cluster graph* has the set of all taxa in the source trees as its ve
 - **one** - The number of trees in which the pair of taxa appear as a proper cluster in.
 - **depth** - The sum of the depths of the $lca$ of the proper cluster in all of the source trees.
 - **branch** - The sum of the root to $lca$ branch lengths of the proper cluster in all of the source trees. If branch lengths are missing defaults to one (equivalent to depth). Do not use if source trees contain a mix of some trees with branch lengths and some without.
+-- **bootstrap** - The sum of bootstrap values of the $lca$ nodes across trees where two taxa appear as a proper cluster.
 
-The **branch** weighting strategy is recommended when branch lengths are available. Otherwise, the **depth** weighting strategy is recommended over the **one** weighting strategy.
+The **branch** weighting strategy is recommended when branch lengths are available. Otherwise, the **depth** weighting strategy is recommended over the **one** weighting strategy. The **bootstrap** strategy has not yet been empirically assessed.
 
 ### Tree Weighting
 
