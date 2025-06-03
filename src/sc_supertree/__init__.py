@@ -1,22 +1,22 @@
-"""
-Spectral Cluster Supertree
+"""Spectral Cluster Supertree.
 
 A scalable and accurate algorithm for merging rooted phylogenetic trees.
 """
 
-__all__ = ["load_trees", "construct_supertree"]
+__all__ = ["construct_supertree", "load_trees"]
 __copyright__ = "Copyright 2023, Robert McArthur"
 __license__ = "BSD"
 __version__ = "2025.3.24"
 
 import os
+from pathlib import Path
 
 from cogent3 import TreeNode, make_tree
 
 from sc_supertree.scs import construct_supertree
 
 
-def load_trees(source_tree_file: str | bytes | os.PathLike) -> list[TreeNode]:
+def load_trees(source_tree_file: str | os.PathLike) -> list[TreeNode]:
     """Load a line-separated file of Newick-formatted trees.
 
     Parameters
@@ -28,7 +28,8 @@ def load_trees(source_tree_file: str | bytes | os.PathLike) -> list[TreeNode]:
     -------
     list[TreeNode]
         A list of all source trees in the file.
+
     """
-    with open(source_tree_file, "r") as f:
-        source_trees: list[TreeNode] = [make_tree(line.strip()) for line in f]  # type: ignore
+    with Path(source_tree_file).open() as f:
+        source_trees: list[TreeNode] = [make_tree(line.strip()) for line in f]
     return source_trees

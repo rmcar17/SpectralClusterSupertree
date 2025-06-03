@@ -26,11 +26,10 @@ def scs(
     in_file: str,
     out_file: str,
     pcg_weighting: Literal["one", "depth", "branch"],
+    *,
     disable_contraction: bool,
-):
-    """
-    Runs spectral cluster supertree over the given set of source trees.
-    """
+) -> None:
+    """Run spectral cluster supertree over the given set of source trees."""
     source_trees = load_trees(in_file)
     supertree = construct_supertree(
         source_trees,
