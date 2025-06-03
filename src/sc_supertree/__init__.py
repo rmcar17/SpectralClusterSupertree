@@ -11,12 +11,12 @@ __version__ = "2025.3.24"
 import os
 from pathlib import Path
 
-from cogent3 import TreeNode, make_tree
+from cogent3 import PhyloNode, make_tree
 
 from sc_supertree.scs import construct_supertree
 
 
-def load_trees(source_tree_file: str | os.PathLike) -> list[TreeNode]:
+def load_trees(source_tree_file: str | os.PathLike) -> list[PhyloNode]:
     """Load a line-separated file of Newick-formatted trees.
 
     Parameters
@@ -31,5 +31,5 @@ def load_trees(source_tree_file: str | os.PathLike) -> list[TreeNode]:
 
     """
     with Path(source_tree_file).open() as f:
-        source_trees: list[TreeNode] = [make_tree(line.strip()) for line in f]
+        source_trees: list[PhyloNode] = [make_tree(line.strip()) for line in f]
     return source_trees
