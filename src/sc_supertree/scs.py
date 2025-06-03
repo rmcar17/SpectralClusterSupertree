@@ -337,8 +337,7 @@ def _contract_proper_cluster_graph(
                 # Simply delete the edge weight (edge will be deleted later)
                 old_edge = edge_tuple(vertex, neighbour)
                 if vertex_set.issuperset(neighbour):
-                    if old_edge in edge_weights:
-                        del edge_weights[old_edge]
+                    edge_weights.pop(old_edge, None)
                     continue
 
                 # Otherwise we are connecting to something outside
