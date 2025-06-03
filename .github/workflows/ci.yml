@@ -49,3 +49,41 @@ jobs:
       with:
         github-token: ${{ secrets.github_token }}
         parallel-finished: true
+
+  type_check:
+    name: Type Check
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: "Run Type Checking for ${{ matrix.python-version }}" 
+        run: |
+          pip install nox
+          nox -s type_check-${{ matrix.python-version }}
+
+  lint:
+    name: Linting
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: "Run Linting for ${{ matrix.python-version }}" 
+        run: |
+          pip install nox
+          nox -s ruff-${{ matrix.python-version }}
