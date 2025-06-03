@@ -376,7 +376,7 @@ def _contract_proper_cluster_graph(
 
 
 def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
-    """Connects the input trees by making them adjacent to a new root.
+    """Connect the input trees by making them adjacent to a new root.
 
     Parameters
     ----------
@@ -489,7 +489,7 @@ def _proper_cluster_graph_edges(
     dict[PcgVertex, int],
     dict[EdgeTuple, int],
 ]:
-    """Constructs a proper cluster graph for a collection of weighted trees.
+    """Construct a proper cluster graph for a collection of weighted trees.
 
     For a tree, two leaves belong to a proper cluster if the path connecting
     them does not pass through the root. Equivalently, they are part of a
@@ -645,7 +645,7 @@ def _dfs_pcg_weights(
 
 
 def edge_tuple(v1: PcgVertex, v2: PcgVertex) -> EdgeTuple:
-    """Generates an edge representing two taxa.
+    """Generate an edge representing two taxa.
 
     Orders the taxa for consistent behaviour.
 
@@ -668,7 +668,7 @@ def edge_tuple(v1: PcgVertex, v2: PcgVertex) -> EdgeTuple:
 
 
 def tuple_sorted(iterable: Iterable[Taxa]) -> PcgVertex:
-    """Generates a new vertex representing an iterable of taxa.
+    """Generate a new vertex representing an iterable of taxa.
 
     Sorts the taxa then converts them into a tuple for predictable ordering.
 
@@ -687,7 +687,7 @@ def tuple_sorted(iterable: Iterable[Taxa]) -> PcgVertex:
 
 
 def _get_all_tip_names(trees: Iterable[TreeNode]) -> set[Taxa]:
-    """Collects all taxa names from an iterable of trees.
+    """Collect all taxa names from an iterable of trees.
 
     Parameters
     ----------
@@ -707,7 +707,7 @@ def _get_all_tip_names(trees: Iterable[TreeNode]) -> set[Taxa]:
 
 
 def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> TreeNode:
-    """Generates a rooted tree of the taxa.
+    """Generate a rooted tree of the taxa.
 
     All tip names are made adjacent to a new root node.
 
