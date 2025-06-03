@@ -500,15 +500,15 @@ def _proper_cluster_graph_edges(
     assert pcg_weighting in ["one", "branch", "depth", "bootstrap"]
 
     if pcg_weighting == "one":
-        length_function = lambda length, tree: 1
+        length_function = lambda length, tree: 1  # noqa: E731
     elif pcg_weighting == "depth":
-        length_function = lambda length, tree: length + 1
+        length_function = lambda length, tree: length + 1  # noqa: E731
     elif pcg_weighting == "branch":
-        length_function = lambda length, tree: length + (
+        length_function = lambda length, tree: length + (  # noqa: E731
             1 if tree.length is None else tree.length
         )
     elif pcg_weighting == "bootstrap":
-        length_function = lambda length, tree: tree.params["support"]
+        length_function = lambda length, tree: tree.params["support"]  # noqa: E731
     else:
         raise ValueError(f"Unexpected pcg weighting method '{pcg_weighting}'.")
 
