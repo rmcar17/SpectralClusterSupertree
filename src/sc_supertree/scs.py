@@ -24,7 +24,7 @@ EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 def construct_supertree(
     trees: Sequence[TreeNode],
     weights: Sequence[float] | None = None,
-    pcg_weighting: Literal["one", "branch", "depth"] = "one",
+    pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     contract_edges: bool = True,
     random_state: np.random.RandomState = np.random.RandomState(),
 ) -> TreeNode:
@@ -43,7 +43,7 @@ def construct_supertree(
         The trees to find the supertree of.
     weights : Sequence[float] | None, optional
         The weights of the given trees, by default None.
-    pcg_weighting : Literal["one", "branch", "depth"], optional
+    pcg_weighting : Literal["one", "branch", "depth", "bootstrap"], optional
         The weighting strategy to use, by default "one".
     contract_edges : bool, optional
         Whether to contract the edges of the proper cluster graph, by default True.
@@ -63,7 +63,7 @@ def construct_supertree(
     """
     assert len(trees) >= 1, "there must be at least one tree"
 
-    assert pcg_weighting in ["one", "branch", "depth"]
+    assert pcg_weighting in ["one", "branch", "depth", "bootstrap"]
 
     # Input trees are of equal weight if none is specified
     if weights is None:
@@ -454,7 +454,7 @@ def _proper_cluster_graph_edges(
     pcg_vertices: PcgVertexSet,
     trees: Sequence[TreeNode],
     weights: Sequence[float],
-    pcg_weighting: Literal["one", "branch", "depth"],
+    pcg_weighting: Literal["one", "branch", "depth", "bootstrap"],
 ) -> tuple[
     PcgEdgeMap, dict[EdgeTuple, float], dict[PcgVertex, int], dict[EdgeTuple, int]
 ]:
@@ -477,7 +477,7 @@ def _proper_cluster_graph_edges(
         The trees to construct the proper cluster graph from.
     weights : Sequence[float]
         Associated weights of each of the trees.
-    pcg_weighting : Literal["one", "branch", "depth"]
+    pcg_weighting : Literal["one", "branch", "depth", "bootstrap"]
         The weighting strategy to use.
 
     Returns
@@ -497,16 +497,20 @@ def _proper_cluster_graph_edges(
         edges[vertex] = set()
         taxa_occurrences[vertex] = 0
 
-    assert pcg_weighting in ["one", "branch", "depth"]
+    assert pcg_weighting in ["one", "branch", "depth", "bootstrap"]
 
     if pcg_weighting == "one":
         length_function = lambda length, tree: 1
     elif pcg_weighting == "depth":
         length_function = lambda length, tree: length + 1
-    else:
+    elif pcg_weighting == "branch":
         length_function = lambda length, tree: length + (
             1 if tree.length is None else tree.length
         )
+    elif pcg_weighting == "bootstrap":
+        length_function = lambda length, tree: tree.params["support"]
+    else:
+        raise ValueError(f"Unexpected pcg weighting method '{pcg_weighting}'.")
 
     for tree, weight in zip(trees, weights):
         for side in tree:
@@ -555,7 +559,7 @@ def _dfs_pcg_weights(
     length : float
         The length from the internal node to the root of the tree.
     length_function : Callable[[float, PhyloNode], float]
-        Function which applied the weighting strategy.
+        Function which applies the weighting strategy.
 
     Returns
     -------
