@@ -367,12 +367,12 @@ def _contract_proper_cluster_graph(
             edges[vertex] = set()
 
     # Add the new edges to the graph
-    for edge in new_edge_weights:
+    for edge, weights in new_edge_weights.items():
         u, v = edge
         edges[u].add(v)
         edges[v].add(u)
 
-        edge_weights[edge] = max(new_edge_weights[edge])
+        edge_weights[edge] = max(weights)
 
 
 def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
