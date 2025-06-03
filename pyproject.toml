@@ -3,7 +3,7 @@ build-backend = "flit_core.buildapi"
 requires = ["flit_core >=3.4"]
 
 [project]
-authors = [{name = "Robert McArthur"}]
+authors = [{ name = "Robert McArthur" }]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
@@ -20,9 +20,9 @@ keywords = [
   "supertree",
   "phylogeny",
   "biology",
-  "bioinformatics",
+  "bioinformatics"
 ]
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 name = "sc-supertree"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -38,8 +38,7 @@ scs = "sc_supertree.cli:scs"
 
 [project.optional-dependencies]
 dev = [
-  "black==25.1.0",
-  "isort==6.0.1",
+  "ruff==0.11.12",
   "click==8.2.1",
   "mypy==1.16.0",
   "docformatter",
@@ -47,7 +46,7 @@ dev = [
   "pytest",
   "pytest-cov",
   "pytest-xdist",
-  "nox",
+  "nox"
 ]
 test = ["pytest", "pytest-cov", "pytest-xdist", "nox"]
 
@@ -58,29 +57,90 @@ name = "sc_supertree"
 addopts = ["--strict-config", "-ra"]
 testpaths = "tests"
 
-[tool.black]
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | build
-  | doc
-  | dist
-  | tests/data
-)/
-'''
-line-length = 88
-target-version = ["py310", "py311", "py312"]
+[tool.ruff]
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".ipynb_checkpoints",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pyenv",
+  ".pytest_cache",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  ".vscode",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "site-packages",
+  "venv"
+]
 
-[tool.isort]
-atomic = true
-force_grid_wrap = 0
-include_trailing_comma = true
-lines_after_imports = 2
-lines_between_types = 1
-multi_line_output = 3
-use_parentheses = true
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+target-version = "py311"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["ALL"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+  "S101", # asserts allowed in tests...
+  "INP001", # __init__.py files are not required...
+  "N802", # allow non snake_case function names for fixtures
+  "N803", # allow use of fixture constants
+  "SLF001", # private member access is useful for testing
+  "FBT001", # allow bool pos args for parameterisation
+  "D" # don't require docstrings
+]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
