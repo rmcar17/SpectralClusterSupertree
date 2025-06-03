@@ -20,8 +20,9 @@ def construct_supertree(
     trees: Sequence[TreeNode],
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
+    *,
     contract_edges: bool = True,
-    random_state: np.random.RandomState = np.random.RandomState(),
+    random_state: np.random.RandomState | None = None,
 ) -> TreeNode:
     """Spectral Cluster Supertree (SCS).
 
@@ -57,6 +58,9 @@ def construct_supertree(
        Discrete Applied Mathematics, 105(1-3), 147-158.
 
     """
+    if random_state is None:
+        random_state = np.random.RandomState()
+
     assert len(trees) >= 1, "there must be at least one tree"
 
     assert pcg_weighting in ["one", "branch", "depth", "bootstrap"]
@@ -134,8 +138,8 @@ def construct_supertree(
                 new_induced_trees,
                 new_weights,
                 pcg_weighting,
-                contract_edges,
-                random_state,
+                contract_edges=contract_edges,
+                random_state=random_state,
             ),
         )
 
