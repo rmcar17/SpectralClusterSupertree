@@ -539,15 +539,15 @@ def _proper_cluster_graph_edges(
         raise ValueError(msg)
 
     if pcg_weighting == "one":
-        length_function = lambda length, tree: 1  # noqa: E731
+        length_function = lambda _length, _tree: 1  # noqa: E731
     elif pcg_weighting == "depth":
-        length_function = lambda length, tree: length + 1  # noqa: E731
+        length_function = lambda length, _tree: length + 1  # noqa: E731
     elif pcg_weighting == "branch":
         length_function = lambda length, tree: length + (  # noqa: E731
             1 if tree.length is None else tree.length
         )
     elif pcg_weighting == "bootstrap":
-        length_function = lambda length, tree: tree.params["support"]  # noqa: E731
+        length_function = lambda _length, tree: tree.params["support"]  # noqa: E731
     else:
         msg = f"Unexpected pcg weighting method '{pcg_weighting}'."
         raise ValueError(msg)
