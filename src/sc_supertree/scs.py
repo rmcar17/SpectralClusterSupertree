@@ -1,18 +1,13 @@
+from collections.abc import Callable, Collection, Iterable, Sequence
 from typing import (
-    Callable,
-    Collection,
-    Iterable,
     Literal,
     NewType,
-    Sequence,
     TypeAlias,
 )
 
 import numpy as np
-
 from cogent3.core.tree import PhyloNode, TreeBuilder, TreeNode
 from sklearn.cluster import SpectralClustering
-
 
 Taxa = NewType("Taxa", str)
 PcgVertex: TypeAlias = tuple[Taxa, ...]
@@ -60,6 +55,7 @@ def construct_supertree(
     .. [1] Semple, C., & Steel, M. (2000).
        A supertree method for rooted trees.
        Discrete Applied Mathematics, 105(1-3), 147-158.
+
     """
     assert len(trees) >= 1, "there must be at least one tree"
 
@@ -81,10 +77,9 @@ def construct_supertree(
 
     # If there are less than or only two names, can instantly return a tree
     if len(all_names) <= 2:
-        tree = _tip_names_to_tree(all_names)
-        return tree
+        return _tip_names_to_tree(all_names)
 
-    pcg_vertices: PcgVertexSet = set((name,) for name in all_names)
+    pcg_vertices: PcgVertexSet = {(name,) for name in all_names}
 
     (
         pcg_edges,
@@ -128,7 +123,9 @@ def construct_supertree(
 
         # Note, inducing could possible remove trees.
         new_induced_trees, new_weights = _generate_induced_trees_with_weights(
-            component, trees, weights
+            component,
+            trees,
+            weights,
         )
 
         # Find the supertree for the induced trees
@@ -139,26 +136,26 @@ def construct_supertree(
                 pcg_weighting,
                 contract_edges,
                 random_state,
-            )
+            ),
         )
 
         missing_tips = component.difference(_get_all_tip_names(new_induced_trees))
 
         # In this case, treat these tips as individual subtrees
-        child_trees.extend(map(lambda x: _tip_names_to_tree((x,)), missing_tips))
+        child_trees.extend(_tip_names_to_tree((x,)) for x in missing_tips)
 
     # Connect the child trees by making adjacent to a new root.
-    supertree = _connect_trees(child_trees)
-    return supertree
+    return _connect_trees(child_trees)
 
 
-def _denamify(tree: TreeNode):
+def _denamify(tree: TreeNode) -> None:
     """Remove all non-tip names in the trees.
 
     Parameters
     ----------
     tree : TreeNode
         The trees to remove internal node names of.
+
     """
     for node in tree.iter_nontips(include_self=True):
         node.name = None
@@ -176,6 +173,7 @@ def _component_to_names_set(component: PcgVertexSet) -> set[Taxa]:
     -------
     set[Taxa]
         A set of names of taxa in the component.
+
     """
     names_set: set[Taxa] = set()
     for c in component:
@@ -206,6 +204,7 @@ def spectral_cluster_graph(
     -------
     list[PcgVertexSet]
         The bipartition of taxa of the proper cluster graph.
+
     """
     sc = SpectralClustering(
         2,
@@ -227,7 +226,7 @@ def spectral_cluster_graph(
     idxs = sc.fit_predict(edges)
 
     partition: list[PcgVertexSet] = [set(), set()]
-    for vertex, idx in zip(vertex_list, idxs):
+    for vertex, idx in zip(vertex_list, idxs, strict=True):
         partition[idx].add(vertex)
 
     return partition
@@ -268,6 +267,7 @@ def _contract_proper_cluster_graph(
         The number of times each taxon appears in any of the input trees.
     taxa_co_occurrences : dict[EdgeTuple, int]
         The number of times two taxa appear as a proper cluster.
+
     """
     # Construct a new graph containing only the edges of maximal weight.
     # The components of this graph are the vertices following contraction
@@ -299,13 +299,21 @@ def _contract_proper_cluster_graph(
 
     # Generate a mapping from the old to new vertices
     vertex_to_contraction: dict[PcgVertex, PcgVertex] = {}
-    for contraction, new_vertex in zip(contractions, processed_contractions):
+    for contraction, new_vertex in zip(
+        contractions,
+        processed_contractions,
+        strict=True,
+    ):
         for vertex in contraction:
             vertex_to_contraction[vertex] = new_vertex
 
     # Contract the graph
     new_edge_weights: dict[EdgeTuple, list[float]] = {}
-    for contraction, new_vertex in zip(contractions, processed_contractions):
+    for contraction, new_vertex in zip(
+        contractions,
+        processed_contractions,
+        strict=True,
+    ):
         # Remove the contraction from the graph
         vertices.difference_update(contraction)
         vertex_set = set(new_vertex)
@@ -323,7 +331,8 @@ def _contract_proper_cluster_graph(
                 # Otherwise we are connecting to something outside
                 # of this contraction
                 new_edge_pair = edge_tuple(
-                    new_vertex, vertex_to_contraction.get(neighbour, neighbour)
+                    new_vertex,
+                    vertex_to_contraction.get(neighbour, neighbour),
                 )
 
                 # There may be multiple edges to a vertex outside of the contraction
@@ -365,6 +374,7 @@ def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
     -------
     TreeNode
         A tree connecting all the input trees.
+
     """
     if len(trees) == 1:
         (one,) = trees  # Unpack only tree
@@ -374,7 +384,9 @@ def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
 
 
 def _generate_induced_trees_with_weights(
-    names: set[Taxa], trees: Sequence[TreeNode], weights: Sequence[float]
+    names: set[Taxa],
+    trees: Sequence[TreeNode],
+    weights: Sequence[float],
 ) -> tuple[list[TreeNode], list[float]]:
     """Induces the input trees on the set of names.
 
@@ -399,11 +411,12 @@ def _generate_induced_trees_with_weights(
     tuple[list[TreeNode], list[float]]
         The induced trees.
         The corresponding weights.
+
     """
     induced_trees: list[TreeNode] = []
     new_weights: list[float] = []
 
-    for tree, weight in zip(trees, weights):
+    for tree, weight in zip(trees, weights, strict=True):
         # If the tree would end up with less than two leaves,
         # there is no point inducing (no proper clusters)
         if len(names.intersection(tree.get_tip_names())) < 2:
@@ -416,7 +429,8 @@ def _generate_induced_trees_with_weights(
 
 
 def _get_graph_components(
-    vertices: PcgVertexSet, edges: PcgEdgeMap
+    vertices: PcgVertexSet,
+    edges: PcgEdgeMap,
 ) -> list[PcgVertexSet]:
     """Gather the components of a graph.
 
@@ -431,6 +445,7 @@ def _get_graph_components(
     -------
     list[PcgVertexSet]
         A list of components of the proper cluster graph.
+
     """
     components: list[PcgVertexSet] = []
 
@@ -456,7 +471,10 @@ def _proper_cluster_graph_edges(
     weights: Sequence[float],
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"],
 ) -> tuple[
-    PcgEdgeMap, dict[EdgeTuple, float], dict[PcgVertex, int], dict[EdgeTuple, int]
+    PcgEdgeMap,
+    dict[EdgeTuple, float],
+    dict[PcgVertex, int],
+    dict[EdgeTuple, int],
 ]:
     """Constructs a proper cluster graph for a collection of weighted trees.
 
@@ -487,6 +505,7 @@ def _proper_cluster_graph_edges(
         The weights of the edges of the proper cluster graph.
         The number of times each taxon appears in any of the input trees.
         The number of times two taxa appear as a proper cluster.
+
     """
     edges: PcgEdgeMap = {}
     edge_weights: dict[EdgeTuple, float] = {}
@@ -510,9 +529,10 @@ def _proper_cluster_graph_edges(
     elif pcg_weighting == "bootstrap":
         length_function = lambda length, tree: tree.params["support"]  # noqa: E731
     else:
-        raise ValueError(f"Unexpected pcg weighting method '{pcg_weighting}'.")
+        msg = f"Unexpected pcg weighting method '{pcg_weighting}'."
+        raise ValueError(msg)
 
-    for tree, weight in zip(trees, weights):
+    for tree, weight in zip(trees, weights, strict=True):
         for side in tree:
             side_taxa = _dfs_pcg_weights(
                 edges,
@@ -565,6 +585,7 @@ def _dfs_pcg_weights(
     -------
     list[PcgVertex]
         All descendants of the current node.
+
     """
     if tree.is_tip():
         tip_name: Taxa = tree.name  # type: ignore
@@ -624,6 +645,7 @@ def edge_tuple(v1: PcgVertex, v2: PcgVertex) -> EdgeTuple:
     -------
     EdgeTuple
         The unique edge representing these taxa.
+
     """
     if v1 < v2:
         return (v1, v2)
@@ -644,6 +666,7 @@ def tuple_sorted(iterable: Iterable[Taxa]) -> PcgVertex:
     -------
     PcgVertex
         A new vertex representing the group of taxa.
+
     """
     return tuple(sorted(iterable))
 
@@ -660,6 +683,7 @@ def _get_all_tip_names(trees: Iterable[TreeNode]) -> set[Taxa]:
     -------
     set[Taxa]
         A set containing the tip names of the trees.
+
     """
     names: set[Taxa] = set()
     for tree in trees:
@@ -681,6 +705,7 @@ def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> TreeNode:
     -------
     TreeNode
         A star tree with a root connecting each of the tip names.
+
     """
     tree_builder = TreeBuilder(constructor=TreeNode).create_edge  # type: ignore
     tips = [tree_builder([], tip_name, {}) for tip_name in tip_names]
