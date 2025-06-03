@@ -392,7 +392,7 @@ def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
     if len(trees) == 1:
         (one,) = trees  # Unpack only tree
         return one
-    tree_builder = TreeBuilder(constructor=TreeNode).edge_from_edge  # type: ignore
+    tree_builder = TreeBuilder(constructor=TreeNode).edge_from_edge  # type: ignore[reportArgumentType]
     return tree_builder(None, trees)
 
 
@@ -434,7 +434,7 @@ def _generate_induced_trees_with_weights(
         # there is no point inducing (no proper clusters)
         if len(names.intersection(tree.get_tip_names())) < 2:
             continue
-        induced_trees.append(tree._get_sub_tree(names))  # type: ignore
+        induced_trees.append(tree._get_sub_tree(names))  # noqa: SLF001 # type: ignore[reportArgumentType]
         induced_trees[-1].name = "root"
         new_weights.append(weight)
 
@@ -608,7 +608,7 @@ def _dfs_pcg_weights(
 
     """
     if tree.is_tip():
-        tip_name: Taxa = tree.name  # type: ignore
+        tip_name: Taxa = tree.name  # type: ignore[reportAssignmentType]
         return [(tip_name,)]
 
     length = length_function(length, tree)
@@ -707,7 +707,7 @@ def _get_all_tip_names(trees: Iterable[TreeNode]) -> set[Taxa]:
     """
     names: set[Taxa] = set()
     for tree in trees:
-        names.update(tree.get_tip_names())  # type: ignore
+        names.update(tree.get_tip_names())  # type: ignore[reportArgumentType]
     return names
 
 
@@ -727,6 +727,6 @@ def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> TreeNode:
         A star tree with a root connecting each of the tip names.
 
     """
-    tree_builder = TreeBuilder(constructor=TreeNode).create_edge  # type: ignore
+    tree_builder = TreeBuilder(constructor=TreeNode).create_edge  # type: ignore[reportArgumentType]
     tips = [tree_builder([], tip_name, {}) for tip_name in tip_names]
     return _connect_trees(tips)
