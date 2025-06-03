@@ -14,7 +14,7 @@ from sc_supertree import __version__, construct_supertree, load_trees
     "--pcg-weighting",
     help="Proper cluster graph weighting strategy.",
     default="branch",
-    type=click.Choice(["one", "depth", "branch"], case_sensitive=False),
+    type=click.Choice(["one", "depth", "branch", "bootstrap"], case_sensitive=False),
 )
 @click.option(
     "--disable-contraction",
@@ -25,7 +25,7 @@ from sc_supertree import __version__, construct_supertree, load_trees
 def scs(
     in_file: str,
     out_file: str,
-    pcg_weighting: Literal["one", "depth", "branch"],
+    pcg_weighting: Literal["one", "depth", "branch", "bootstrap"],
     *,
     disable_contraction: bool,
 ) -> None:
