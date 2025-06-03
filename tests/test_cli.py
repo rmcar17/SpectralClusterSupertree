@@ -1,10 +1,9 @@
-import os
-
-from tempfile import mktemp
-from typing import Literal, Sequence
+import tempfile
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Literal
 
 import pytest
-
 from click.testing import CliRunner
 from cogent3 import TreeNode, load_tree, make_tree
 from helpers import load_expected_tree_file, load_source_tree_file
@@ -16,34 +15,41 @@ def scs_test_cli(
     in_trees: Sequence[TreeNode],
     expected: TreeNode,
     pcg_weighting: Literal["one", "branch", "depth"] = "one",
+    *,
     contract_edges: bool = True,
-):
+) -> None:
     runner = CliRunner()
 
-    in_file = mktemp(suffix=".tre")
-
-    with open(in_file, "w") as f:
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".tre", delete=False) as in_file:
         for tree in in_trees:
-            f.write(str(tree) + "\n")
+            in_file.write(str(tree) + "\n")
+        in_file_path = Path(in_file.name)
 
-    out_file = mktemp(suffix=".tre")
+    with tempfile.NamedTemporaryFile(
+        mode="w+",
+        suffix=".tre",
+        delete=False,
+    ) as out_file:
+        out_file_path = Path(out_file.name)
 
-    args = ["-i", in_file, "-o", out_file, "-p", pcg_weighting]
-    if not contract_edges:
-        args.append("--disable-contraction")
+    try:
+        args = ["-i", in_file_path, "-o", out_file_path, "-p", pcg_weighting]
+        if not contract_edges:
+            args.append("--disable-contraction")
 
-    runner.invoke(scs, args)
-    os.remove(in_file)
+        runner.invoke(scs, args)
 
-    result = load_tree(out_file).sorted()
-    os.remove(out_file)
+        result = load_tree(out_file_path).sorted()
+        expected = expected.sorted()
 
-    expected = expected.sorted()
+        assert result.same_shape(expected), f"{result} != {expected}"
+    finally:
+        # Clean up both temporary files
+        in_file_path.unlink()
+        out_file_path.unlink()
 
-    assert result.same_shape(expected), str(result) + " != " + str(expected)
 
-
-def test_agreeable():
+def test_agreeable() -> None:
     """
     Tests for when spectral clustering is not required.
     """
@@ -64,9 +70,10 @@ def test_agreeable():
 
 
 @pytest.mark.parametrize(
-    "model_tree_file,source_tree_file", [("dcm_model_tree.tre", "dcm_source_trees.tre")]
+    ("model_tree_file", "source_tree_file"),
+    [("dcm_model_tree.tre", "dcm_source_trees.tre")],
 )
-def test_dcm_agreeable(model_tree_file, source_tree_file):
+def test_dcm_agreeable(model_tree_file: str, source_tree_file: str) -> None:
     """
     An example where DCM decomposition means the model tree can always be reproduced.
     """
@@ -76,7 +83,7 @@ def test_dcm_agreeable(model_tree_file, source_tree_file):
     scs_test_cli(source_trees, model_tree)
 
 
-def test_simple_inconsistency():
+def test_simple_inconsistency() -> None:
     """
     Proper cluster graph shaped:
 
@@ -92,7 +99,7 @@ def test_simple_inconsistency():
     scs_test_cli([tree_1, tree_2, tree_3], expected)
 
 
-def test_two_squares_inconsitency():
+def test_two_squares_inconsitency() -> None:
     """
     Proper cluster graph shaped:
 
@@ -124,7 +131,7 @@ def test_two_squares_inconsitency():
     )
 
 
-def test_simple_contration():
+def test_simple_contration() -> None:
     """
     Small problems where contraction is required
     """
@@ -135,7 +142,7 @@ def test_simple_contration():
     scs_test_cli([tree_1, tree_2], expected)
 
 
-def test_size_two_trees():
+def test_size_two_trees() -> None:
     """
     Trees with only two leaves. No information gained but a special case nonetheless.
     """
@@ -152,9 +159,10 @@ def test_size_two_trees():
     scs_test_cli([tree_1, tree_4], tree_1)
 
 
-def test_depth_weighting():
+def test_depth_weighting() -> None:
     """
-    Test that depth pcg weighting works appropriately (branch equivalent when no lengths).
+    Test that depth pcg weighting works appropriately
+    (branch equivalent when no lengths).
     """
     tree_1 = make_tree("(a,(b,(c,(d,e))))")
     tree_2 = make_tree("(d,(f,(a,b)))")
@@ -183,7 +191,7 @@ def test_depth_weighting():
     )
 
 
-def test_branch_weighting():
+def test_branch_weighting() -> None:
     """
     Test branch lengths are accounted for appropriately.
     """
@@ -214,14 +222,14 @@ def test_branch_weighting():
     )
 
 
-def test_dcm_iq():
+def test_dcm_iq() -> None:
     expected = load_expected_tree_file("dcm_iq_expected.tre")
     source_trees = load_source_tree_file("dcm_iq_source.tre")
 
     scs_test_cli(source_trees, expected, pcg_weighting="branch")
 
 
-def test_supertriplets():
+def test_supertriplets() -> None:
     expected = load_expected_tree_file("supertriplets_expected.tre")
     source_trees = load_source_tree_file("supertriplets_source.tre")
 
