@@ -6,6 +6,7 @@ from typing import (
 )
 
 import numpy as np
+from cogent3 import make_tree
 from cogent3.core.tree import PhyloNode, TreeBuilder, TreeNode
 from sklearn.cluster import SpectralClustering
 
@@ -23,7 +24,7 @@ def construct_supertree(
     *,
     contract_edges: bool = True,
     random_state: np.random.RandomState | None = None,
-) -> TreeNode:
+) -> PhyloNode:
     """Spectral Cluster Supertree (SCS).
 
     Constructs a supertree from a collection of input trees. The supertree
@@ -48,7 +49,7 @@ def construct_supertree(
 
     Returns
     -------
-    TreeNode
+    PhyloNode
         The generated supertree.
 
     References
@@ -82,7 +83,7 @@ def construct_supertree(
 
     if len(trees) == 1:  # If there is only one tree left, we can simply graft it on
         _denamify(trees[0])
-        return trees[0]
+        return make_tree(trees[0].get_newick())
 
     # The vertices of the proper cluster graph
     # are the names of the tips of all trees
@@ -121,7 +122,7 @@ def construct_supertree(
         components = spectral_cluster_graph(pcg_vertices, pcg_weights, random_state)
 
     # The child trees corresponding to the components of the graph
-    child_trees: list[TreeNode] = []
+    child_trees: list[PhyloNode] = []
 
     for pcg_component in components:
         component = _component_to_names_set(pcg_component)
@@ -374,24 +375,24 @@ def _contract_proper_cluster_graph(
         edge_weights[edge] = max(weights)
 
 
-def _connect_trees(trees: Collection[TreeNode]) -> TreeNode:
+def _connect_trees(trees: Collection[PhyloNode]) -> PhyloNode:
     """Connect the input trees by making them adjacent to a new root.
 
     Parameters
     ----------
-    trees : Collection[TreeNode]
+    trees : Collection[PhyloNode]
         The input trees to connect.
 
     Returns
     -------
-    TreeNode
+    PhyloNode
         A tree connecting all the input trees.
 
     """
     if len(trees) == 1:
         (one,) = trees  # Unpack only tree
         return one
-    tree_builder = TreeBuilder(constructor=TreeNode).edge_from_edge  # type: ignore[reportArgumentType]
+    tree_builder = TreeBuilder(constructor=PhyloNode).edge_from_edge  # type: ignore[reportArgumentType]
     return tree_builder(None, trees)
 
 
@@ -710,7 +711,7 @@ def _get_all_tip_names(trees: Iterable[TreeNode]) -> set[Taxa]:
     return names
 
 
-def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> TreeNode:
+def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> PhyloNode:
     """Generate a rooted tree of the taxa.
 
     All tip names are made adjacent to a new root node.
@@ -722,10 +723,10 @@ def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> TreeNode:
 
     Returns
     -------
-    TreeNode
+    PhyloNode
         A star tree with a root connecting each of the tip names.
 
     """
-    tree_builder = TreeBuilder(constructor=TreeNode).create_edge  # type: ignore[reportArgumentType]
+    tree_builder = TreeBuilder(constructor=PhyloNode).create_edge  # type: ignore[reportArgumentType]
     tips = [tree_builder([], tip_name, {}) for tip_name in tip_names]
     return _connect_trees(tips)
