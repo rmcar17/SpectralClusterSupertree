@@ -6,7 +6,7 @@ A scalable and accurate algorithm for merging rooted phylogenetic trees.
 __all__ = ["construct_supertree", "load_trees"]
 __copyright__ = "Copyright 2023, Robert McArthur"
 __license__ = "BSD"
-__version__ = "2025.6.3"
+__version__ = "2025.6.11"
 
 import os
 from pathlib import Path
