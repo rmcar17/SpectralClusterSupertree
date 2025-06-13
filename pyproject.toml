@@ -50,6 +50,9 @@ dev = [
 ]
 test = ["pytest", "pytest-cov", "pytest-xdist", "nox"]
 
+[project.entry-points."cogent3.app"]
+load_trees = "sc_supertree._app:load_trees"
+
 [tool.flit.module]
 name = "sc_supertree"
 
