@@ -40,3 +40,38 @@ def sc_supertree(
         contract_edges=contract_edges,
         random_state=random_state,
     )
+
+
+@define_app
+def outgroup_root(
+    tree: cogent3.PhyloNode,
+    *,
+    priority_outgroups: Sequence[str],
+) -> cogent3.PhyloNode:
+    """Outgroup root a tree.
+
+    Outgroup roots the tree at the first outgroup found.
+
+    Parameters
+    ----------
+    tree : cogent3.TreeNode
+        The tree to outgroup root.
+    priority_outgroups : Sequence[str]
+        A sequence of names to prioritise outgroup rooting at.
+        Roots at the first name found at the sequence.
+
+    Returns
+    -------
+    cogent3.TreeNode
+        A tree rooted at the first outgroup found.
+
+    """
+    tip_names = set(tree.get_tip_names())
+
+    # Root at the first found name
+    for name in priority_outgroups:
+        if name in tip_names:
+            return tree.rooted(name)
+
+    msg = f"Tree does not contain any tip names in: {priority_outgroups}"
+    raise ValueError(msg)

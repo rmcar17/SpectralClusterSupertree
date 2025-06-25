@@ -4,6 +4,7 @@ from typing import Literal
 
 import pytest
 from cogent3 import TreeNode, get_app, make_tree
+from cogent3.app.composable import NotCompleted
 from helpers import TEST_DATA_DIR, load_expected_tree_file, load_source_tree_file
 
 
@@ -291,3 +292,48 @@ def test_supertriplets() -> None:
         expected,
         pcg_weighting="depth",
     )
+
+
+def _tree_equal(tree1: TreeNode, tree2: TreeNode) -> bool:
+    return tree1.sorted().same_shape(tree2.sorted())
+
+
+@pytest.mark.parametrize(
+    "priority_outgroups",
+    [("b",), ("b", "c", "d", "e", "a"), ["x", "y", "b", "c", "d"]],
+)
+def test_outgroup_root(priority_outgroups: Sequence[str]) -> None:
+    tree = make_tree("((a,b),((c,d),(e,f)))")
+    expected = make_tree("(b,(a,((c,d),(e,f))))")
+
+    app = get_app("outgroup_root", priority_outgroups=priority_outgroups)
+
+    got = app(tree)
+    assert _tree_equal(got, expected)
+
+
+@pytest.mark.parametrize(
+    "priority_outgroups",
+    [("c",), ["c", "b", "d", "e", "a"], ("x", "y", "c", "b", "d")],
+)
+def test_another_outgroup_root(priority_outgroups: Sequence[str]) -> None:
+    tree = make_tree("((a,b),((c,d),(e,f)))")
+    expected = make_tree("(c,(d,((e,f),(a,b))))")
+
+    app = get_app("outgroup_root", priority_outgroups=priority_outgroups)
+
+    got = app(tree)
+    assert _tree_equal(got, expected)
+
+
+@pytest.mark.parametrize(
+    "priority_outgroups",
+    [("x",), (), ("x", "cat")],
+)
+def test_missing_outgroup(priority_outgroups: Sequence[str]) -> None:
+    tree = make_tree("((a,b),((c,d),(e,f)))")
+
+    app = get_app("outgroup_root", priority_outgroups=priority_outgroups)
+
+    got = app(tree)
+    assert isinstance(got, NotCompleted)
