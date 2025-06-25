@@ -434,7 +434,7 @@ def _generate_induced_trees_with_weights(
         # there is no point inducing (no proper clusters)
         if len(names.intersection(tree.get_tip_names())) < 2:
             continue
-        induced_trees.append(tree._get_sub_tree(names))  # noqa: SLF001 # type: ignore[reportArgumentType]
+        induced_trees.append(tree.get_sub_tree(names, as_rooted=True))
         induced_trees[-1].name = "root"
         new_weights.append(weight)
 
