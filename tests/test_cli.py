@@ -5,15 +5,15 @@ from typing import Literal
 
 import pytest
 from click.testing import CliRunner
-from cogent3 import TreeNode, load_tree, make_tree
+from cogent3 import PhyloNode, load_tree, make_tree
 from helpers import load_expected_tree_file, load_source_tree_file
 
 from sc_supertree.cli import scs
 
 
 def scs_test_cli(
-    in_trees: Sequence[TreeNode],
-    expected: TreeNode,
+    in_trees: Sequence[PhyloNode],
+    expected: PhyloNode,
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,
     contract_edges: bool = True,

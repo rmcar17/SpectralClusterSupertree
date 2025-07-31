@@ -54,7 +54,7 @@ def outgroup_root(
 
     Parameters
     ----------
-    tree : cogent3.TreeNode
+    tree : cogent3.PhyloNode
         The tree to outgroup root.
     priority_outgroups : Sequence[str]
         A sequence of names to prioritise outgroup rooting at.
@@ -62,7 +62,7 @@ def outgroup_root(
 
     Returns
     -------
-    cogent3.TreeNode
+    cogent3.PhyloNode
         A tree rooted at the first outgroup found.
 
     """

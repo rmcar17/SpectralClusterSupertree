@@ -2,15 +2,15 @@ from collections.abc import Sequence
 from typing import Literal
 
 import pytest
-from cogent3 import TreeNode, make_tree
+from cogent3 import PhyloNode, make_tree
 from helpers import load_expected_tree_file, load_source_tree_file
 
 from sc_supertree import construct_supertree
 
 
 def scs_test(
-    in_trees: Sequence[TreeNode],
-    expected: TreeNode,
+    in_trees: Sequence[PhyloNode],
+    expected: PhyloNode,
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,

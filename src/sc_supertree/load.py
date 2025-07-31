@@ -14,7 +14,7 @@ def load_trees(source_tree_file: str | os.PathLike) -> list[PhyloNode]:
 
     Returns
     -------
-    list[TreeNode]
+    list[PhyloNode]
         A list of all source trees in the file.
 
     """

@@ -3,14 +3,14 @@ from collections.abc import Sequence
 from typing import Literal
 
 import pytest
-from cogent3 import TreeNode, get_app, make_tree
+from cogent3 import PhyloNode, get_app, make_tree
 from cogent3.app.composable import NotCompleted
 from helpers import TEST_DATA_DIR, load_expected_tree_file, load_source_tree_file
 
 
 def scs_test_app(
-    in_trees: Sequence[TreeNode],
-    expected: TreeNode,
+    in_trees: Sequence[PhyloNode],
+    expected: PhyloNode,
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,
@@ -30,7 +30,7 @@ def scs_test_app(
 
 def scs_test_pipeline(
     in_trees_file: str | os.PathLike,
-    expected: TreeNode,
+    expected: PhyloNode,
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,
@@ -294,7 +294,7 @@ def test_supertriplets() -> None:
     )
 
 
-def _tree_equal(tree1: TreeNode, tree2: TreeNode) -> bool:
+def _tree_equal(tree1: PhyloNode, tree2: PhyloNode) -> bool:
     return tree1.sorted().same_shape(tree2.sorted())
 
 

@@ -36,4 +36,4 @@ def scs(
         pcg_weighting=pcg_weighting,
         contract_edges=not disable_contraction,
     )
-    supertree.write(out_file, format="newick")
+    supertree.write(out_file)

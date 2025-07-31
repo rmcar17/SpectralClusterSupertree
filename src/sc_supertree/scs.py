@@ -7,7 +7,7 @@ from typing import (
 
 import numpy as np
 from cogent3 import make_tree
-from cogent3.core.tree import PhyloNode, TreeBuilder, TreeNode
+from cogent3.core.tree import PhyloNode, TreeBuilder
 from sklearn.cluster import SpectralClustering
 
 Taxa = NewType("Taxa", str)
@@ -18,7 +18,7 @@ EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
 
 
 def construct_supertree(
-    trees: Sequence[TreeNode],
+    trees: Sequence[PhyloNode],
     weights: Sequence[float] | None = None,
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"] = "one",
     *,
@@ -36,7 +36,7 @@ def construct_supertree(
 
     Parameters
     ----------
-    trees : Sequence[TreeNode]
+    trees : Sequence[PhyloNode]
         The trees to find the supertree of.
     weights : Sequence[float] | None, optional
         The weights of the given trees, by default None.
@@ -162,17 +162,17 @@ def construct_supertree(
     return _connect_trees(child_trees)
 
 
-def _denamify(tree: TreeNode) -> None:
+def _denamify(tree: PhyloNode) -> None:
     """Remove all non-tip names in the trees.
 
     Parameters
     ----------
-    tree : TreeNode
+    tree : PhyloNode
         The trees to remove internal node names of.
 
     """
     for node in tree.iter_nontips(include_self=True):
-        node.name = None
+        node.name = ""
 
 
 def _component_to_names_set(component: PcgVertexSet) -> set[Taxa]:
@@ -398,9 +398,9 @@ def _connect_trees(trees: Collection[PhyloNode]) -> PhyloNode:
 
 def _generate_induced_trees_with_weights(
     names: set[Taxa],
-    trees: Sequence[TreeNode],
+    trees: Sequence[PhyloNode],
     weights: Sequence[float],
-) -> tuple[list[TreeNode], list[float]]:
+) -> tuple[list[PhyloNode], list[float]]:
     """Induces the input trees on the set of names.
 
     A tree can be induced on a set by removing all leaves that
@@ -414,19 +414,19 @@ def _generate_induced_trees_with_weights(
     ----------
     names : set[Taxa]
         The taxa to induce the trees on.
-    trees : Sequence[TreeNode]
+    trees : Sequence[PhyloNode]
         The trees to induce.
     weights : Sequence[float]
         The weights of the trees.
 
     Returns
     -------
-    tuple[list[TreeNode], list[float]]
+    tuple[list[PhyloNode], list[float]]
         The induced trees.
         The corresponding weights.
 
     """
-    induced_trees: list[TreeNode] = []
+    induced_trees: list[PhyloNode] = []
     new_weights: list[float] = []
 
     for tree, weight in zip(trees, weights, strict=True):
@@ -482,7 +482,7 @@ def _get_graph_components(
 
 def _proper_cluster_graph_edges(
     pcg_vertices: PcgVertexSet,
-    trees: Sequence[TreeNode],
+    trees: Sequence[PhyloNode],
     weights: Sequence[float],
     pcg_weighting: Literal["one", "branch", "depth", "bootstrap"],
 ) -> tuple[
@@ -506,7 +506,7 @@ def _proper_cluster_graph_edges(
     ----------
     pcg_vertices : PcgVertexSet
         The vertices of the proper cluster graph.
-    trees : Sequence[TreeNode]
+    trees : Sequence[PhyloNode]
         The trees to construct the proper cluster graph from.
     weights : Sequence[float]
         Associated weights of each of the trees.
@@ -693,12 +693,12 @@ def tuple_sorted(iterable: Iterable[Taxa]) -> PcgVertex:
     return tuple(sorted(iterable))
 
 
-def _get_all_tip_names(trees: Iterable[TreeNode]) -> set[Taxa]:
+def _get_all_tip_names(trees: Iterable[PhyloNode]) -> set[Taxa]:
     """Collect all taxa names from an iterable of trees.
 
     Parameters
     ----------
-    trees : Iterable[TreeNode]
+    trees : Iterable[PhyloNode]
         The trees to collect the taxa of.
 
     Returns
