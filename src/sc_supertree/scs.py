@@ -1,4 +1,4 @@
-from collections.abc import Callable, Collection, Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from typing import (
     Literal,
     NewType,
@@ -375,7 +375,7 @@ def _contract_proper_cluster_graph(
         edge_weights[edge] = max(weights)
 
 
-def _connect_trees(trees: Collection[PhyloNode]) -> PhyloNode:
+def _connect_trees(trees: Sequence[PhyloNode]) -> PhyloNode:
     """Connect the input trees by making them adjacent to a new root.
 
     Parameters
