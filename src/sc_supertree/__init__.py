@@ -9,4 +9,4 @@ from sc_supertree.scs import construct_supertree
 __all__ = ["construct_supertree", "load_trees"]
 __copyright__ = "Copyright 2023, Robert McArthur"
 __license__ = "BSD"
-__version__ = "2025.6.25"
+__version__ = "2025.7.31"
