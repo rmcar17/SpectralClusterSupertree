@@ -549,7 +549,7 @@ def _proper_cluster_graph_edges(
             1 if tree.length is None else tree.length
         )
     elif pcg_weighting == "bootstrap":
-        length_function = lambda _length, tree: tree.params["support"]  # noqa: E731
+        length_function = lambda _length, tree: tree.support  # noqa: E731
     else:
         msg = f"Unexpected pcg weighting method '{pcg_weighting}'."
         raise ValueError(msg)
@@ -730,5 +730,5 @@ def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> PhyloNode:
 
     """
     tree_builder = TreeBuilder(constructor=PhyloNode).create_edge  # type: ignore[reportArgumentType]
-    tips = [tree_builder([], tip_name, {}) for tip_name in tip_names]
+    tips = [tree_builder([], tip_name, {}, None, None) for tip_name in tip_names]
     return _connect_trees(tips)
