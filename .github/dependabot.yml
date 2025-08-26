@@ -10,9 +10,11 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    multi-ecosystem-group: "all-deps"
     
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    multi-ecosystem-group: "all-deps"
