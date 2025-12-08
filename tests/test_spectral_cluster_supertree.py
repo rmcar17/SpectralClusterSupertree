@@ -1,8 +1,9 @@
 from collections.abc import Sequence
-from typing import Literal
+from typing import Any, Literal
 
 import pytest
 from cogent3 import PhyloNode, make_tree
+from cogent3.app.composable import NotCompleted
 from helpers import load_expected_tree_file, load_source_tree_file
 
 from sc_supertree import construct_supertree
@@ -252,3 +253,22 @@ def test_supertriplets() -> None:
     source_trees = load_source_tree_file("supertriplets_source.tre")
 
     scs_test(source_trees, expected, pcg_weighting="depth")
+
+
+def test_not_completed() -> None:
+    """
+    Tests for when at least one tree is not completed.
+    """
+
+    tree_1 = make_tree("((a,b),(c,d))")
+    tree_2 = make_tree("((a,b),(c,(d,e)))")
+
+    expected = make_tree("((a,b),(c,(d,e)))")
+
+    trees: list[Any] = [
+        tree_1,
+        tree_2,
+        NotCompleted("ERROR", "local", "Example NotCompleted"),
+    ]
+
+    scs_test(trees, expected, weights=[1, 2, 3])

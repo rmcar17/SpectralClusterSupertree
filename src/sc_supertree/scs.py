@@ -7,6 +7,7 @@ from typing import (
 
 import numpy as np
 from cogent3 import make_tree
+from cogent3.app.composable import NotCompleted
 from cogent3.core.tree import PhyloNode, TreeBuilder
 from sklearn.cluster import SpectralClustering
 
@@ -80,6 +81,20 @@ def construct_supertree(
             f"and tree weights ({len(weights)}) must match."
         )
         raise ValueError(msg)
+
+    filtered_pairs = [
+        (t, w)
+        for t, w in zip(trees, weights, strict=True)
+        if not isinstance(t, NotCompleted)
+    ]
+
+    # If all trees were NotCompleted
+    if len(filtered_pairs) == 0:
+        msg = "There must be at least one tree to make a supertree."
+        raise ValueError(msg)
+
+    # Unpack filtered lists back to variables
+    trees, weights = zip(*filtered_pairs, strict=True)
 
     if len(trees) == 1:  # If there is only one tree left, we can simply graft it on
         _denamify(trees[0])
