@@ -1,7 +1,6 @@
 from collections.abc import Callable, Iterable, Sequence
 from typing import (
     Literal,
-    NewType,
     TypeAlias,
 )
 
