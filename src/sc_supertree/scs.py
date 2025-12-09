@@ -11,8 +11,7 @@ from cogent3.app.composable import NotCompleted
 from cogent3.core.tree import PhyloNode, TreeBuilder
 from sklearn.cluster import SpectralClustering
 
-Taxa = NewType("Taxa", str)
-PcgVertex: TypeAlias = tuple[Taxa, ...]
+PcgVertex: TypeAlias = tuple[str, ...]
 PcgVertexSet: TypeAlias = set[PcgVertex]
 PcgEdgeMap: TypeAlias = dict[PcgVertex, PcgVertexSet]
 EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
@@ -190,7 +189,7 @@ def _denamify(tree: PhyloNode) -> None:
         node.name = ""
 
 
-def _component_to_names_set(component: PcgVertexSet) -> set[Taxa]:
+def _component_to_names_set(component: PcgVertexSet) -> set[str]:
     """Convert the vertex representation to a set of names of taxa.
 
     Parameters
@@ -200,11 +199,11 @@ def _component_to_names_set(component: PcgVertexSet) -> set[Taxa]:
 
     Returns
     -------
-    set[Taxa]
+    set[str]
         A set of names of taxa in the component.
 
     """
-    names_set: set[Taxa] = set()
+    names_set: set[str] = set()
     for c in component:
         names_set.update(c)
     return names_set
@@ -321,7 +320,7 @@ def _contract_proper_cluster_graph(
     # Find the new vertices in processed_contractions
     processed_contractions: list[PcgVertex] = []
     for contraction in contractions:
-        processed: list[Taxa] = []
+        processed: list[str] = []
         for vertex in contraction:
             processed.extend(vertex)
         processed_contractions.append(tuple_sorted(processed))
@@ -412,7 +411,7 @@ def _connect_trees(trees: Sequence[PhyloNode]) -> PhyloNode:
 
 
 def _generate_induced_trees_with_weights(
-    names: set[Taxa],
+    names: set[str],
     trees: Sequence[PhyloNode],
     weights: Sequence[float],
 ) -> tuple[list[PhyloNode], list[float]]:
@@ -427,7 +426,7 @@ def _generate_induced_trees_with_weights(
 
     Parameters
     ----------
-    names : set[Taxa]
+    names : set[str]
         The taxa to induce the trees on.
     trees : Sequence[PhyloNode]
         The trees to induce.
@@ -625,7 +624,7 @@ def _dfs_pcg_weights(
 
     """
     if tree.is_tip():
-        tip_name: Taxa = tree.name  # type: ignore[reportAssignmentType]
+        tip_name = tree.name
         return [(tip_name,)]
 
     length = length_function(length, tree)
@@ -689,14 +688,14 @@ def edge_tuple(v1: PcgVertex, v2: PcgVertex) -> EdgeTuple:
     return (v2, v1)
 
 
-def tuple_sorted(iterable: Iterable[Taxa]) -> PcgVertex:
+def tuple_sorted(iterable: Iterable[str]) -> PcgVertex:
     """Generate a new vertex representing an iterable of taxa.
 
     Sorts the taxa then converts them into a tuple for predictable ordering.
 
     Parameters
     ----------
-    iterable : Iterable[Taxa]
+    iterable : Iterable[str]
         An iterable of taxa.
 
     Returns
@@ -708,7 +707,7 @@ def tuple_sorted(iterable: Iterable[Taxa]) -> PcgVertex:
     return tuple(sorted(iterable))
 
 
-def _get_all_tip_names(trees: Iterable[PhyloNode]) -> set[Taxa]:
+def _get_all_tip_names(trees: Iterable[PhyloNode]) -> set[str]:
     """Collect all taxa names from an iterable of trees.
 
     Parameters
@@ -718,24 +717,24 @@ def _get_all_tip_names(trees: Iterable[PhyloNode]) -> set[Taxa]:
 
     Returns
     -------
-    set[Taxa]
+    set[str]
         A set containing the tip names of the trees.
 
     """
-    names: set[Taxa] = set()
+    names: set[str] = set()
     for tree in trees:
         names.update(tree.get_tip_names())  # type: ignore[reportArgumentType]
     return names
 
 
-def _tip_names_to_tree(tip_names: Iterable[Taxa]) -> PhyloNode:
+def _tip_names_to_tree(tip_names: Iterable[str]) -> PhyloNode:
     """Generate a rooted tree of the taxa.
 
     All tip names are made adjacent to a new root node.
 
     Parameters
     ----------
-    tip_names : Iterable[Taxa]
+    tip_names : Iterable[str]
         The names of the tips.
 
     Returns
