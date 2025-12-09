@@ -1,7 +1,6 @@
 from collections.abc import Callable, Iterable, Sequence
 from typing import (
     Literal,
-    TypeAlias,
 )
 
 import numpy as np
@@ -10,10 +9,10 @@ from cogent3.app.composable import NotCompleted
 from cogent3.core.tree import PhyloNode, TreeBuilder
 from sklearn.cluster import SpectralClustering
 
-PcgVertex: TypeAlias = tuple[str, ...]
-PcgVertexSet: TypeAlias = set[PcgVertex]
-PcgEdgeMap: TypeAlias = dict[PcgVertex, PcgVertexSet]
-EdgeTuple: TypeAlias = tuple[PcgVertex, PcgVertex]
+type PcgVertex = tuple[str, ...]
+type PcgVertexSet = set[PcgVertex]
+type PcgEdgeMap = dict[PcgVertex, PcgVertexSet]
+type EdgeTuple = tuple[PcgVertex, PcgVertex]
 
 
 def construct_supertree(
