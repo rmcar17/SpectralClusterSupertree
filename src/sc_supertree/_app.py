@@ -5,14 +5,33 @@ from typing import Literal
 import cogent3
 import cogent3.app.typing as c3_types
 import numpy as np
+from citeable import Article
 from cogent3.app.composable import define_app
 from cogent3.util.misc import extend_docstring_from
 
 from sc_supertree.load import load_trees as lts
 from sc_supertree.scs import construct_supertree as cs
 
+cite_sc_tree = Article(
+    key="10.3389/fmolb.2024.1432495",
+    author=[
+        "McArthur, Robert N.",
+        "Zehmakan, Ahad N.",
+        "Charleston, Michael A.",
+        "Lin, Yu",
+        "Huttley, Gavin",
+    ],
+    title="Spectral cluster supertree: fast and statistically robust merging of rooted phylogenetic trees",
+    year=2024,
+    journal="Frontiers in Molecular Biosciences",
+    volume=11,
+    pages="1432495",
+    doi="10.3389/fmolb.2024.1432495",
+    url="https://www.frontiersin.org/journals/molecular-biosciences/articles/10.3389/fmolb.2024.1432495",
+)
 
-@define_app
+
+@define_app(cite=cite_sc_tree)
 @extend_docstring_from(lts)
 def load_trees(
     source_tree_file: c3_types.IdentifierType | str | os.PathLike,  # type: ignore[reportInvalidTypeVarUse]
@@ -23,7 +42,7 @@ def load_trees(
     return lts(source_tree_file)
 
 
-@define_app
+@define_app(cite=cite_sc_tree)
 @extend_docstring_from(cs)
 def sc_supertree(
     trees: list[cogent3.PhyloNode],
@@ -42,7 +61,7 @@ def sc_supertree(
     )
 
 
-@define_app
+@define_app(cite=cite_sc_tree)
 def outgroup_root(
     tree: cogent3.PhyloNode,
     *,
