@@ -13,14 +13,14 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
-  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.14"
 ]
 dependencies = [
   "click",
   "citeable",
   "numpy",
   "cogent3>=2026.2.28a1",
-  "scikit-learn>=1.5.2",
+  "scikit-learn>=1.5.2"
 ]
 keywords = ["supertree", "phylogeny", "biology", "bioinformatics"]
 license = { file = "LICENSE" }
@@ -47,7 +47,7 @@ dev = [
   "pytest",
   "pytest-cov",
   "pytest-xdist",
-  "nox",
+  "nox"
 ]
 test = ["pytest", "pytest-cov", "pytest-xdist", "nox"]
 
@@ -90,7 +90,7 @@ exclude = [
   "dist",
   "node_modules",
   "site-packages",
-  "venv",
+  "venv"
 ]
 
 # Same as Black.
@@ -104,7 +104,7 @@ target-version = "py312"
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 select = ["ALL"]
-ignore = ["C901", "PLR0912", "PLR0913", "PLR2004", "D"]
+ignore = ["C901", "PLR0912", "PLR0913", "PLR2004", "E501", "D"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -115,13 +115,13 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
-  "S101",   # asserts allowed in tests...
+  "S101", # asserts allowed in tests...
   "INP001", # __init__.py files are not required...
-  "N802",   # allow non snake_case function names for fixtures
-  "N803",   # allow use of fixture constants
+  "N802", # allow non snake_case function names for fixtures
+  "N803", # allow use of fixture constants
   "SLF001", # private member access is useful for testing
   "FBT001", # allow bool pos args for parameterisation
-  "D",      # don't require docstrings
+  "D" # don't require docstrings
 ]
 
 [tool.ruff.format]
