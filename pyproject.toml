@@ -20,7 +20,7 @@ dependencies = [
   "citeable",
   "numpy",
   "cogent3>=2026.2.28a1",
-  "scikit-learn>=1.5.2"
+  "scikit-learn>=1.8.0"
 ]
 keywords = ["supertree", "phylogeny", "biology", "bioinformatics"]
 license = { file = "LICENSE" }
