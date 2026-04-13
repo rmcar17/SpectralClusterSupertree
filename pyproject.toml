@@ -19,7 +19,7 @@ dependencies = [
   "click",
   "citeable",
   "numpy",
-  "cogent3>=2026.2.28a1",
+  "cogent3>=2026.3.23a0",
   "scikit-learn>=1.5.2"
 ]
 keywords = ["supertree", "phylogeny", "biology", "bioinformatics"]
