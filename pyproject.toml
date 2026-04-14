@@ -41,7 +41,7 @@ scs = "sc_supertree.cli:scs"
 dev = [
   "ruff>=0.15.10",
   "click==8.3.2",
-  "mypy>=1.19.1",
+  "mypy>=1.20.1",
   "docformatter",
   "flit",
   "pytest",
