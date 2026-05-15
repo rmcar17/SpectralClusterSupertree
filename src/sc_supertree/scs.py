@@ -557,11 +557,8 @@ def _proper_cluster_graph_edges(
     elif pcg_weighting == "depth":
         length_function = lambda length, _tree: length + 1  # noqa: E731
     elif pcg_weighting == "branch":
-        length_function = lambda length, tree: (
-            length
-            + (  # noqa: E731
-                1 if tree.length is None else tree.length
-            )
+        length_function = lambda length, tree: (  # noqa: E731
+            length + (1 if tree.length is None else tree.length)
         )
     elif pcg_weighting == "bootstrap":
         length_function = lambda _length, tree: tree.support  # noqa: E731
