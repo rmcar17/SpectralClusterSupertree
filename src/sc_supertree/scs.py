@@ -5,8 +5,8 @@ from typing import (
 
 import numpy as np
 from cogent3 import make_tree
-from cogent3.app.composable import NotCompleted
 from cogent3.core.tree import PhyloNode, TreeBuilder
+from scinexus.composable import NotCompleted
 from sklearn.cluster import SpectralClustering
 
 type PcgVertex = tuple[str, ...]
@@ -557,8 +557,11 @@ def _proper_cluster_graph_edges(
     elif pcg_weighting == "depth":
         length_function = lambda length, _tree: length + 1  # noqa: E731
     elif pcg_weighting == "branch":
-        length_function = lambda length, tree: length + (  # noqa: E731
-            1 if tree.length is None else tree.length
+        length_function = lambda length, tree: (
+            length
+            + (  # noqa: E731
+                1 if tree.length is None else tree.length
+            )
         )
     elif pcg_weighting == "bootstrap":
         length_function = lambda _length, tree: tree.support  # noqa: E731

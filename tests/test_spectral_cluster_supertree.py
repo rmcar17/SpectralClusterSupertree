@@ -3,8 +3,8 @@ from typing import Any, Literal
 
 import pytest
 from cogent3 import PhyloNode, make_tree
-from cogent3.app.composable import NotCompleted
 from helpers import load_expected_tree_file, load_source_tree_file
+from scinexus.composable import NotCompleted
 
 from sc_supertree import construct_supertree
 

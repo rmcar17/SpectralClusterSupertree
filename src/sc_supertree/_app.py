@@ -6,8 +6,8 @@ import cogent3
 import cogent3.app.typing as c3_types
 import numpy as np
 from citeable import Article
-from cogent3.app.composable import define_app
-from cogent3.util.misc import extend_docstring_from
+from scinexus.composable import define_app
+from scinexus.misc import extend_docstring_from
 
 from sc_supertree.load import load_trees as lts
 from sc_supertree.scs import construct_supertree as cs

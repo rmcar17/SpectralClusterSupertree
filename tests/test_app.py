@@ -4,8 +4,8 @@ from typing import Literal
 
 import pytest
 from cogent3 import PhyloNode, get_app, make_tree
-from cogent3.app.composable import NotCompleted
 from helpers import TEST_DATA_DIR, load_expected_tree_file, load_source_tree_file
+from scinexus.composable import NotCompleted
 
 
 def scs_test_app(
