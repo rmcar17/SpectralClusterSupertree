@@ -40,7 +40,7 @@ scs = "sc_supertree.cli:scs"
 [project.optional-dependencies]
 dev = [
   "ruff>=0.15.10",
-  "click==8.3.3",
+  "click==8.4.0",
   "mypy>=1.20.1",
   "docformatter",
   "flit",
