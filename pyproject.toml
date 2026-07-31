@@ -39,7 +39,7 @@ scs = "sc_supertree.cli:scs"
 
 [project.optional-dependencies]
 dev = [
-  "ruff>=0.15.10",
+  "ruff>=0.16.0",
   "click==8.4.1",
   "mypy>=1.20.1",
   "docformatter",
@@ -104,7 +104,7 @@ target-version = "py312"
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 select = ["ALL"]
-ignore = ["C901", "PLR0912", "PLR0913", "PLR2004", "E501", "D"]
+ignore = ["C901", "PLR0912", "PLR0913", "PLR2004", "E501", "D", "CPY001", "PLR0917"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
