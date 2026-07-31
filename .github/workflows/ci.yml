@@ -31,6 +31,12 @@ jobs:
       - name: "Run nox testing for ${{ matrix.python-version }}" 
         run: "nox -s test-${{ matrix.python-version }} -- --cov --cov-report=lcov:${{matrix.os}}-${{matrix.python-version}}.lcov --cov-report=term --cov-append --durations=20"
 
+
+      - name: Trust coveralls (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew trust coverallsapp/coveralls
+
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@v2
         with:
